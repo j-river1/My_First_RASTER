@@ -193,13 +193,14 @@ if(file.exists("RData/RtSNE_Norm_AllVariables_MultiplePerplexity.RData")){
   save(dataTSNE,file = "RData/RtSNE_Norm_AllVariables_MultiplePerplexity.RData")
 }else{
   load(file = "RData/RtSNE_Norm_AllVariables_MultiplePerplexity.RData")
+  
 }
 
 
 ### Multiple kames tot withniss
 
 k.max <- 50
-data <- as.matrix(dataTSNE$Y)
+data <- as.matrix(dataTSNE[[1]]$Y)
 wss <- sapply(1:k.max, 
               function(k){kmeans(data, k, nstart=50,iter.max = 100)$tot.withinss})
 
@@ -213,12 +214,12 @@ m=kmeans(data, 11, nstart=50,iter.max = 100)
 
 colors = rainbow(length(unique(m$cluster)))
 names(colors) = unique(m$cluster)
-plot(dataTSNE$Y, t='n', main="tsne")
-text(dataTSNE$Y, labels=m$cluster, col=colors[m$cluster])
+plot(dataTSNE[[1]]$Y, t='n', main="tsne")
+text(dataTSNE[[1]]$Y, labels=m$cluster, col=colors[m$cluster])
 
 
 dataFrameCluster=data.frame(Levels=1:nrow(dataExport),Cluster=NA)
-dataFrameCluster[-c(SecondLevelsWNA),]$Cluster=fit$classification
+dataFrameCluster[-c(SecondLevelsWNA),]$Cluster=fit$cluster
 
 ### Map Cluster
 plot(rasterRef)
