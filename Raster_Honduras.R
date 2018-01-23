@@ -221,3 +221,23 @@ info_raster <- function (name_raster, menu)
   return (final_result)
   
 }
+
+
+#graphics_ombrothermic plots ombrothermic diagram
+#Arguments. -Data Frame. It is composed by months and values.
+#Return Ombrothermic diagram
+
+graphics_ombrothermic <- function (months, values_temp, values_preci)
+{
+  #Data
+  data <- data.frame(Months = months, Values_Preci = values_preci, Values_Temp = values_temp)
+  
+  #Graph 
+  par(mar = c(5,5,2,5))
+  with(data, plot(Months, Values_Preci, type="l", col="red3", ylab= "Mililitros", ylim=c(0,3)))
+  
+  
+  
+}
+
+
