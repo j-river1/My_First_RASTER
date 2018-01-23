@@ -1,6 +1,6 @@
 #Libraries
 library(raster)
-
+library(dplyr)
 
 
 
@@ -37,6 +37,18 @@ setwd(ElevationFile)
 listFiles=list.files(pattern = "*.tif$")
 ElevationInfo=stack(listFiles[1])
 
+
+#***Read coordinatesExtract Weather***
+
+rasterRef=ClimeInfo$bio_10
+levelsWNA=which(!is.na(rasterRef[]))
+coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
+
+
+
+
+
+
 raster_kmeans=raster(paste0(tnse_GNG, ".tif"))
 
 #info_raster works for getting information of raster.
@@ -46,7 +58,22 @@ raster_kmeans=raster(paste0(tnse_GNG, ".tif"))
 info_raster <- function (name_raster)
 {
   raster_info  <- raster(paste0(tnse_GNG, ".tif"))
-  extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(rasterkmeans,coordinatesExtract)))
-  return (raster_info)
+  extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+  
+  #Data Mean Anual 
+  data_Tem_Mean <- data.frame(extraction%>%group_by(V68)%>%summarise(minTemMeanAnual=min(bio_1,na.rm=T),maxTemMeanAnual=max(bio_1,na.rm=T)))
+  
+  #Data Temperature Monthly Range
+  data_Tem_Range <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Monthly_Range = mean(bio_2)))
+  
+  #Data Temperature Anual  Range
+  data_Tem_Range <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Anual_Range = mean(bio_7)))
+  
+  #Data Precipitaion Anual
+  data_Precip <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Precipitation_Anual = mean(bio_12)))
+  
+  data_result <- merge(data_Tem_Range)
+  
+  return (data_Precip )
   
 }
