@@ -50,8 +50,12 @@ coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 #***Read coordinatesExtract Soil***
 crsSystem=ClimeInfo@crs
 soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem)
+#save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
 
-save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
+
+
+#*** Load RData files 
+load(file="./RData/soilsInfo_Projected.RData")
 
 
 raster_kmeans=raster(paste0(tnse_GNG, ".tif"))
@@ -67,13 +71,37 @@ info_raster <- function (name_raster, menu)
 {
   raster_info  <- raster(paste0(name_raster, ".tif"))
   extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-  
-  
-  
+      
   #Put same coordinate system. Soil and weather
   load(file="./RData/soilsInfo_Projected.RData")
-  extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
   
+  if(name_raster == PCA_Kmeans)
+  {   
+    #Extract the Soil Info
+    #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+    #save(extraction_soil ,file="./RData/extraction_soil.RData")
+    load(file="./RData/extraction_soil.RData")
+  }
+  
+  if(name_raster == PCA_Mclust)
+  {
+    #Extract the Soil Info
+    #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+    #save(extraction_soil ,file="./RData/extraction_soil_PCAMCLUST.RData")
+    
+    load(file="./RData/extraction_soil_PCAMCLUST.RData")
+    
+   }
+  
+  if(name_raster == tnse_GNG)
+  {
+    #Extract the Soil Info
+    #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+    #save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
+    
+    load(file="./RData/extraction_soil_PCAMCLUST.RData")
+    
+  }
   
   
   if(menu == 1)
