@@ -2,7 +2,9 @@
 library(raster)
 library(dplyr)
 
-
+#Folders 
+mainDir <- getwd()
+dir.create(file.path(mainDir, "RData"), showWarnings = FALSE)
 
 #***Methods Raster Folders***
 #According to final document, there are three types of classification.
@@ -37,6 +39,7 @@ setwd(ElevationFile)
 listFiles=list.files(pattern = "*.tif$")
 ElevationInfo=stack(listFiles[1])
 
+setwd(mainDir)
 
 #***Read coordinatesExtract Weather***
 
@@ -44,9 +47,11 @@ rasterRef=ClimeInfo$bio_10
 levelsWNA=which(!is.na(rasterRef[]))
 coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
+#***Read coordinatesExtract Soil***
+crsSystem=ClimeInfo@crs
+soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem)
 
-
-
+save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
 
 
 raster_kmeans=raster(paste0(tnse_GNG, ".tif"))
@@ -54,17 +59,30 @@ raster_kmeans=raster(paste0(tnse_GNG, ".tif"))
 #info_raster works for getting information of raster.
 #Arguments.  -name_raster.
 #Return.     -table. With all information 
+# menu = 1. Weather information
+# menu = 2. Soil Information 
 
-info_raster <- function (name_raster)
+
+info_raster <- function (name_raster, menu)
 {
-  raster_info  <- raster(paste0(tnse_GNG, ".tif"))
+  raster_info  <- raster(paste0(name_raster, ".tif"))
   extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
   
+  
+  
+  #Put same coordinate system. Soil and weather
+  load(file="./RData/soilsInfo_Projected.RData")
+  extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+  
+  
+  
+  if(menu == 1)
+  {
+      
   #Data Mean Anual 
   data_Tem_Mean_An <- data.frame(extraction%>%group_by(V68)%>%summarise(minTemMeanAnual=min(bio_1,na.rm=T),maxTemMeanAnual=max(bio_1,na.rm=T)))
   
-  
-  
+    
   #Data Temperature Monthly Range
   data_Tem_Range_Mon <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Monthly_Range = mean(bio_2)))
   data_Tem_Range_Mon$V68 <- NULL
@@ -139,17 +157,39 @@ info_raster <- function (name_raster)
   data_tmean_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Dic = mean(tmean_12)))
   data_tmean_Dic$V68 <- NULL
   
+  result <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
+                  data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic)
+  
+  }
+  
+  if(menu == 2)
+  {
+    #Soil
+    #clay
+    data_clay <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_clay = mean(clay)))
+    
+    
+    
+    #sand 
+    data_sand <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_sand = mean(sand)))
+    data_sand$V5 <- NULL
+    
+    #silt 
+    data_silt <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_slit = mean(silt)))
+    data_silt$V5 <- NULL
+    
+    #watercapi 
+    data_watercapi <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_water_capi = mean(water_holding_capacity)))
+    data_watercapi$V5 <- NULL
+    
+    result <- list (data_clay, data_sand, data_silt, data_watercapi )
+    
+  }
+  
+  #list   
+  final_result <- do.call("cbind", result)
   
   
-  
-  #list 
-  
-  resulta <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
-                   data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic)
-  
-  prueba <- do.call("cbind", resulta)
-  
-  
-  return (prueba )
+  return (final_result)
   
 }
