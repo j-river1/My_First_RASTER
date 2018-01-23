@@ -49,16 +49,12 @@ coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
 #***Read coordinatesExtract Soil***
 crsSystem=ClimeInfo@crs
-soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem)
+#soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem)
 #save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
-
-
-
-#*** Load RData files 
 load(file="./RData/soilsInfo_Projected.RData")
 
 
-raster_kmeans=raster(paste0(tnse_GNG, ".tif"))
+
 
 #info_raster works for getting information of raster.
 #Arguments.  -name_raster.
@@ -76,8 +72,15 @@ info_raster <- function (name_raster, menu)
   load(file="./RData/soilsInfo_Projected.RData")
   
   if(name_raster == PCA_Kmeans)
-  {   
+  { 
+    #Extract the Climate Info
+    extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
+    
+    load(file="./RData/extraction_clim_pcaKmeans.RData")
+    
     #Extract the Soil Info
+    
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil.RData")
     load(file="./RData/extraction_soil.RData")
@@ -126,63 +129,63 @@ info_raster <- function (name_raster, menu)
   
   
   #Data Mean January
-  data_tmean_jan <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_January = mean(tmean_1)))
+  data_tmean_jan <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_January = mean(tmean_1)))
   data_tmean_jan$V68 <- NULL
   
   
   
   #Data Mean February
-  data_tmean_feb <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_February = mean(tmean_2)))
+  data_tmean_feb <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_February = mean(tmean_2)))
   data_tmean_feb$V68 <- NULL
   
   
   #Data Mean March 
-  data_tmean_marc <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_March = mean(tmean_3)))
+  data_tmean_marc <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_March = mean(tmean_3)))
   data_tmean_marc$V68 <- NULL
   
   
   #Data Mean April 
-  data_tmean_apri <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_April = mean(tmean_4)))
+  data_tmean_apri <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_April = mean(tmean_4)))
   data_tmean_apri$V68 <- NULL
   
   
   #Data Mean May 
-  data_tmean_may <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_May = mean(tmean_5)))
+  data_tmean_may <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_May = mean(tmean_5)))
   data_tmean_may$V68 <- NULL
   
   
   #Data Mean June 
-  data_tmean_jun <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_June = mean(tmean_6)))
+  data_tmean_jun <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_June = mean(tmean_6)))
   data_tmean_jun$V68 <- NULL
   
 
   #Data Mean July 
-  data_tmean_jul <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_July = mean(tmean_7)))
+  data_tmean_jul <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_July = mean(tmean_7)))
   data_tmean_jul$V68 <- NULL
   
 
   #Data Mean Agust 
-  data_tmean_agus <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Agust = mean(tmean_8)))
+  data_tmean_agus <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Agust = mean(tmean_8)))
   data_tmean_agus$V68 <- NULL
   
   
   #Data Mean Sept 
-  data_tmean_sept <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Sept = mean(tmean_9)))
+  data_tmean_sept <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Sept = mean(tmean_9)))
   data_tmean_sept$V68 <- NULL
   
 
   #Data Mean Oct 
-  data_tmean_oct <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Oct = mean(tmean_10)))
+  data_tmean_oct <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Oct = mean(tmean_10)))
   data_tmean_oct$V68 <- NULL
   
   
   #Data Mean Nov 
-  data_tmean_Nov <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Nov = mean(tmean_11)))
+  data_tmean_Nov <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Nov = mean(tmean_11)))
   data_tmean_Nov$V68 <- NULL
   
   
   #Data Mean Dic 
-  data_tmean_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Dic = mean(tmean_12)))
+  data_tmean_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Dic = mean(tmean_12)))
   data_tmean_Dic$V68 <- NULL
   
   result <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
@@ -216,7 +219,7 @@ info_raster <- function (name_raster, menu)
   
   #list   
   final_result <- do.call("cbind", result)
-  
+  final_result<- final_result [complete.cases(final_result), ]
   
   return (final_result)
   
