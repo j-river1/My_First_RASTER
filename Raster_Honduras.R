@@ -302,20 +302,37 @@ info_raster <- function (name_raster, menu)
 #Arguments. -Data Frame. It is composed by months and values.
 #Return Ombrothermic diagram
 
-graphics_ombrothermic <- function (numcluster, values_temp, values_preci)
+graphics_ombrothermic <- function (method, numcluster, values_temp, values_preci)
 {
+  
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+  }
+  
+  
   #Data
   #months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
   months_aux <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
   data <- data.frame(Months = seq(1:12), Values_Preci = as.numeric(values_preci), Values_Temp = as.numeric(values_temp))
   
 
-  pdf(paste0("./Ombrothermic_Plots/Diagrama_Ombrotérmico_Cluster_",numcluster, ".pdf")
+  pdf(paste0("./Ombrothermic_Plots/Cluster_",numcluster, "_",name_method ,".pdf"))
   par(mar=c(5,5,2,5))
   matrix_grap <- matrix(nrow=1, ncol=12)
   colnames(matrix_grap) <- months_aux
   matrix_grap[1,] <- as.numeric(values_preci) 
-  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster) )
+  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
   par(new = T)
   with(data, plot(Months, Values_Temp, type="b", pch=16,  axes=F, xlab=NA, ylab=NA, cex=1.2, col= "red", ylim= c(min(Values_Temp), max(Values_Temp))))
   axis(side = 4, )
@@ -345,7 +362,7 @@ graph_all_station <- function (method)
   #Graph for each cluster
   for (i in 1:nrow(infoRaster))
   {
-    graphics_ombrothermic(ixvx, infoRaster[i,values_temp], infoRaster[i,values_preci])
+    graphics_ombrothermic(method, i, infoRaster[i,values_temp], infoRaster[i,values_preci])
     
     
   }
