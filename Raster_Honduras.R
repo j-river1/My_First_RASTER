@@ -73,14 +73,13 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == PCA_Kmeans)
   { 
-    #Extract the Climate Info
-    extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
+    #**Extract the Climate Info
+    #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    #save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
     
     load(file="./RData/extraction_clim_pcaKmeans.RData")
     
-    #Extract the Soil Info
-    
+    #**Extract the Soil Info
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil.RData")
     load(file="./RData/extraction_soil.RData")
@@ -88,7 +87,12 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == PCA_Mclust)
   {
-    #Extract the Soil Info
+    #**Extract the Climate Info
+    #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    #save(extraction,file="./RData/extraction_clim_pca_Mclust.RData")
+    load(file="./RData/extraction_clim_pca_Mclust.RData")
+    
+    #**Extract the Soil Info
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil_PCAMCLUST.RData")
     
@@ -98,6 +102,13 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == tnse_GNG)
   {
+    #**Extract the Climate Info
+    #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    #save(extraction,file="./RData/extraction_clim_tnse_GNG.RData")
+    load(file="./RData/extraction_clim_tnse_GNG.RData")
+    
+    
+    
     #Extract the Soil Info
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
