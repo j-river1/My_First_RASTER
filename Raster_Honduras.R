@@ -5,11 +5,9 @@ library(dplyr)
 #Folders 
 mainDir <- getwd()
 dir.create(file.path(mainDir, "RData"), showWarnings = FALSE)
+dir.create(file.path(mainDir, "Ombrothermic_Plots"), showWarnings = FALSE) 
 
-#***Methods Raster Folders***
-#According to final document, there are three types of classification.
-#1. PCA_Kmeans
-#2. PCA_Mclust
+
 #3. tnse_GNG
 
 
@@ -65,8 +63,9 @@ load(file="./RData/soilsInfo_Projected.RData")
 
 info_raster <- function (name_raster, menu)
 {
-  raster_info  <- raster(paste0(name_raster, ".tif"))
-  extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+  
+  #raster_info  <- raster(paste0(name_raster, ".tif"))
+  #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
       
   #Put same coordinate system. Soil and weather
   load(file="./RData/soilsInfo_Projected.RData")
@@ -139,68 +138,130 @@ info_raster <- function (name_raster, menu)
   data_Precip$V68 <- NULL
   
   
-  #Data Mean January
+  #Data TMean January
   data_tmean_jan <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_January = mean(tmean_1)))
   data_tmean_jan$V68 <- NULL
   
   
   
-  #Data Mean February
+  #Data TMean February
   data_tmean_feb <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_February = mean(tmean_2)))
   data_tmean_feb$V68 <- NULL
   
   
-  #Data Mean March 
+  #Data TMean March 
   data_tmean_marc <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_March = mean(tmean_3)))
   data_tmean_marc$V68 <- NULL
   
   
-  #Data Mean April 
+  #Data TMean April 
   data_tmean_apri <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_April = mean(tmean_4)))
   data_tmean_apri$V68 <- NULL
   
   
-  #Data Mean May 
+  #Data TMean May 
   data_tmean_may <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_May = mean(tmean_5)))
   data_tmean_may$V68 <- NULL
   
   
-  #Data Mean June 
+  #Data TMean June 
   data_tmean_jun <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_June = mean(tmean_6)))
   data_tmean_jun$V68 <- NULL
   
 
-  #Data Mean July 
+  #Data TMean July 
   data_tmean_jul <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_July = mean(tmean_7)))
   data_tmean_jul$V68 <- NULL
   
 
-  #Data Mean Agust 
+  #Data TMean Agust 
   data_tmean_agus <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Agust = mean(tmean_8)))
   data_tmean_agus$V68 <- NULL
   
   
-  #Data Mean Sept 
+  #Data TMean Sept 
   data_tmean_sept <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Sept = mean(tmean_9)))
   data_tmean_sept$V68 <- NULL
   
 
-  #Data Mean Oct 
+  #Data TMean Oct 
   data_tmean_oct <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Oct = mean(tmean_10)))
   data_tmean_oct$V68 <- NULL
   
   
-  #Data Mean Nov 
+  #Data TMean Nov 
   data_tmean_Nov <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Nov = mean(tmean_11)))
   data_tmean_Nov$V68 <- NULL
   
   
-  #Data Mean Dic 
+  #Data TMean Dic 
   data_tmean_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(TMean_Dic = mean(tmean_12)))
   data_tmean_Dic$V68 <- NULL
   
+  #Data PMean January
+  data_pmean_jan <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_January = mean(prec_1)))
+  data_pmean_jan$V68 <- NULL
+  
+  
+  
+  #Data PMean February
+  data_pmean_feb <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_February = mean(prec_2)))
+  data_pmean_feb$V68 <- NULL
+  
+  
+  #Data PMean March 
+  data_pmean_marc <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_March = mean(prec_3)))
+  data_pmean_marc$V68 <- NULL
+  
+  
+  #Data Mean April 
+  data_pmean_apri <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_April = mean(prec_4)))
+  data_pmean_apri$V68 <- NULL
+  
+  
+  #Data Mean May 
+  data_pmean_may <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_May = mean(prec_5)))
+  data_pmean_may$V68 <- NULL
+  
+  
+  #Data Mean June 
+  data_pmean_jun <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_June = mean(prec_6)))
+  data_pmean_jun$V68 <- NULL
+  
+  
+  #Data Mean July 
+  data_pmean_jul <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_July = mean(prec_7)))
+  data_pmean_jul$V68 <- NULL
+  
+  
+  #Data Mean Agust 
+  data_pmean_agus <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_Agust = mean(prec_8)))
+  data_pmean_agus$V68 <- NULL
+  
+  
+  #Data Mean Sept 
+  data_pmean_sept <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_Sept = mean(prec_9)))
+  data_pmean_sept$V68 <- NULL
+  
+  
+  #Data Mean Oct 
+  data_pmean_oct <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_Oct = mean(prec_10)))
+  data_pmean_oct$V68 <- NULL
+  
+  
+  #Data Mean Nov 
+  data_pmean_Nov <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_Nov = mean(prec_11)))
+  data_pmean_Nov$V68 <- NULL
+  
+  
+  #Data Mean Dic 
+  data_pmean_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_Dic = mean(prec_12)))
+  data_pmean_Dic$V68 <- NULL
+  
+  
   result <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
-                  data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic)
+                  data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic, data_pmean_jan, data_pmean_feb, data_pmean_marc, data_pmean_apri, data_pmean_may,
+                  data_pmean_jun, data_pmean_jul, data_pmean_agus, data_pmean_sept, data_pmean_oct, data_pmean_Nov, data_pmean_Dic )
   
   }
   
@@ -241,17 +302,55 @@ info_raster <- function (name_raster, menu)
 #Arguments. -Data Frame. It is composed by months and values.
 #Return Ombrothermic diagram
 
-graphics_ombrothermic <- function (months, values_temp, values_preci)
+graphics_ombrothermic <- function (numcluster, values_temp, values_preci)
 {
   #Data
-  data <- data.frame(Months = months, Values_Preci = values_preci, Values_Temp = values_temp)
+  #months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+  months_aux <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  data <- data.frame(Months = seq(1:12), Values_Preci = as.numeric(values_preci), Values_Temp = as.numeric(values_temp))
   
-  #Graph 
-  par(mar = c(5,5,2,5))
-  with(data, plot(Months, Values_Preci, type="l", col="red3", ylab= "Mililitros", ylim=c(0,3)))
+
+  pdf(paste0("./Ombrothermic_Plots/Diagrama_Ombrotérmico_Cluster_",numcluster, ".pdf")
+  par(mar=c(5,5,2,5))
+  matrix_grap <- matrix(nrow=1, ncol=12)
+  colnames(matrix_grap) <- months_aux
+  matrix_grap[1,] <- as.numeric(values_preci) 
+  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster) )
+  par(new = T)
+  with(data, plot(Months, Values_Temp, type="b", pch=16,  axes=F, xlab=NA, ylab=NA, cex=1.2, col= "red", ylim= c(min(Values_Temp), max(Values_Temp))))
+  axis(side = 4, )
+  mtext(side = 4, line = 3, text= 'Grados Centígrados', cex=0.8)
+  legend("topleft",legend=c("Precipitación", "Temperatura"), lty=c(1,1), pch=c(15, 16), col=c("blue", "red"), cex = 0.8, max(Values_Temp))  
+  dev.off()
+}
+
+
+months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+
+
+#Graph_all_station plots all clusters with ombrothermic plot
+#Arguments -table with all information
+
+graph_all_station <- function (method)
+{
+  
+  
+  values_temp <- c("TMean_January", "TMean_February", "TMean_March", "TMean_April", "TMean_May", "TMean_June", "TMean_July", "TMean_Agust", "TMean_Sept", "TMean_Oct", "TMean_Nov", "TMean_Dic")
+  values_preci <- c("PMean_January", "PMean_February", "PMean_March", "PMean_April", "PMean_May", "PMean_June", "PMean_July", "PMean_Agust", "PMean_Sept", "PMean_Oct", "PMean_Nov", "PMean_Dic")
+  
+  
+  #Graph ombrotermico
+  infoRaster <- info_raster(method, 1)
+  
+  #Graph for each cluster
+  for (i in 1:nrow(infoRaster))
+  {
+    graphics_ombrothermic(ixvx, infoRaster[i,values_temp], infoRaster[i,values_preci])
+    
+    
+  }
   
   
   
 }
-
 
