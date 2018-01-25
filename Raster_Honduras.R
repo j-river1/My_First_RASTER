@@ -7,6 +7,7 @@ mainDir <- getwd()
 dir.create(file.path(mainDir, "RData"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Ombrothermic_Plots"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Excel_Files"), showWarnings = FALSE) 
+dir.create(file.path(mainDir, "Histograms_Temperature_Max_Min"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -35,7 +36,7 @@ ClimeInfo=stack(listFiles)
 
 setwd(ElevationFile)
 listFiles=list.files(pattern = "*.tif$")
-ElevationInfo=stack(listFiles[1])
+ElevationInfo=stack(listFiles[2])
 
 setwd(mainDir)
 
@@ -53,7 +54,6 @@ load(file="./RData/soilsInfo_Projected.RData")
 
 
 
-
 #info_raster works for getting information of raster.
 #Arguments.  -name_raster.
 #Return.     -table. With all information 
@@ -67,8 +67,7 @@ info_raster <- function (name_raster, menu)
   raster_info  <- raster(paste0(name_raster, ".tif"))
   #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
       
-  #Put same coordinate system. Soil and weather
-  load(file="./RData/soilsInfo_Projected.RData")
+
   
   if(name_raster == PCA_Kmeans)
   { 
@@ -128,7 +127,7 @@ info_raster <- function (name_raster, menu)
         
     #**Extract Elevation
     #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    save(extraction_ele ,file="./RData/extraction_ele_tnse_GNG.RData")
+    #save(extraction_ele ,file="./RData/extraction_ele_tnse_GNG.RData")
     load(file="./RData/extraction_ele_tnse_GNG.RData")
   }
   
@@ -313,7 +312,7 @@ info_raster <- function (name_raster, menu)
     
     name_var<- "Elevation"
     #Elevation
-    data_elevati <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Mean_Elev= mean(aspect_HondCholCop)))
+    data_elevati <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Mean_Elev= mean(DEM_CholutecaCopan)))
     
     result <- data_elevati
   }
@@ -324,7 +323,14 @@ info_raster <- function (name_raster, menu)
   #list   
   final_result <- do.call("cbind", result)
   final_result<- final_result [complete.cases(final_result), ]
-  write.csv(final_result, paste0("./Excel_Files/AllVariables_",namefile,"_", name_var ".csv" ), row.names=F)
+  colnames(final_result)[1]<-"GRIDCODE"
+  
+  #Measure the difference
+  measure_diff <- apply(final_result,2, sd)
+  final_result <- rbind(final_result, measure_diff)
+  final_result[nrow(final_result), 1] <- "SD"
+  
+  write.csv(final_result, paste0("./Excel_Files/AllVariables_",namefile,"_", name_var, ".csv" ), row.names=F)
   return (final_result)
   
 }
@@ -366,10 +372,11 @@ graphics_ombrothermic <- function (method, numcluster, values_temp, values_preci
   matrix_grap[1,] <- as.numeric(values_preci) 
   barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
   par(new = T)
-  with(data, plot(Months, Values_Temp, type="b", pch=16,  axes=F, xlab=NA, ylab=NA, cex=1.2, col= "red", ylim= c(min(Values_Temp), max(Values_Temp))))
-  axis(side = 4, )
-  mtext(side = 4, line = 3, text= 'Grados Centígrados', cex=0.8)
-  legend("topleft",legend=c("Precipitación", "Temperatura"), lty=c(1,1), pch=c(15, 16), col=c("blue", "red"), cex = 0.8, max(Values_Temp))  
+  with(data, plot(Months, Values_Temp, type="b", pch=16,  axes=F, xlab=NA, ylab=NA, cex=1.2, col= "red", ylim = c(min(Values_Temp),max(Values_Temp))))
+  #ylim= c(min(Values_Temp), max(Values_Temp))
+  axis(side = 4)
+  mtext(side = 4, line = 3, text= 'Grados Centígrados', cex=1)
+  legend("topleft",legend=c("Precipitación", "Temperatura"), lty=c(1,1), pch=c(15, 16), col=c("blue", "red"), cex = 0.8)  
   dev.off()
 }
 
@@ -402,4 +409,88 @@ graph_all_station <- function (method)
   
   
 }
+
+
+#graphics_histo_temp plots histograms for temperature_max temperature_min
+#Argumetns   method. PCA_Kmean
+#                    PCA_Mclustst
+#                    tnse_GNG 
+
+graphics_histo_temp <- function (method, numcluster, values_temp_min, values_temp_max)
+{
+  
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+  }
+  
+  
+  #Data
+  months_aux <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  data <- data.frame(Months = seq(1:12), Values_TX = as.numeric(values_temp_max), Values_TM = as.numeric(values_temp_min))
+  
+  
+  pdf(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
+  
+  matrix_grap <- matrix(nrow=2, ncol=12)
+  colnames(matrix_grap) <- months_aux
+  matrix_grap[1,] <- as.numeric((values_temp_max) 
+  matrix_grap[2,] <- as.numeric((values_temp_min)                               
+                                                                
+  barplot(matrix_grap, col= ("blue", "red"), names.arg= months_aux, ylab = "Grados Centigrados", cex.names=0.8, main = paste0("Histograma Temperaturas Máxima y Mínima del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
+
+  dev.off()
+}
+
+
+
+#Graph_all_station plots all clusters with ombrothermic plot
+#Arguments -table with all information
+
+
+graph_all_station_TX_TM <- function (method)
+{
+  
+  
+  values_temp <- c("TMean_January", "TMean_February", "TMean_March", "TMean_April", "TMean_May", "TMean_June", "TMean_July", "TMean_Agust", "TMean_Sept", "TMean_Oct", "TMean_Nov", "TMean_Dic")
+  values_preci <- c("PMean_January", "PMean_February", "PMean_March", "PMean_April", "PMean_May", "PMean_June", "PMean_July", "PMean_Agust", "PMean_Sept", "PMean_Oct", "PMean_Nov", "PMean_Dic")
+  
+  
+  #Graph ombrotermico
+  infoRaster <- info_raster(method, 1)
+  
+  #Graph for each cluster
+  for (i in 1:nrow(infoRaster))
+  {
+    graphics_ombrothermic(method, i, infoRaster[i,values_temp], infoRaster[i,values_preci])
+    
+    
+  }
+  
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
