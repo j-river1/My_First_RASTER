@@ -6,7 +6,7 @@ library(dplyr)
 mainDir <- getwd()
 dir.create(file.path(mainDir, "RData"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Ombrothermic_Plots"), showWarnings = FALSE) 
-
+dir.create(file.path(mainDir, "Excel_Files"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -64,7 +64,7 @@ load(file="./RData/soilsInfo_Projected.RData")
 info_raster <- function (name_raster, menu)
 {
   
-  #raster_info  <- raster(paste0(name_raster, ".tif"))
+  raster_info  <- raster(paste0(name_raster, ".tif"))
   #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
       
   #Put same coordinate system. Soil and weather
@@ -72,6 +72,7 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == PCA_Kmeans)
   { 
+    namefile <-  "PCA_Kmeans"
     #**Extract the Climate Info
     #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     #save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
@@ -82,10 +83,16 @@ info_raster <- function (name_raster, menu)
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil.RData")
     load(file="./RData/extraction_soil.RData")
+    
+    #**Extract Elevation
+    #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    #save(extraction_ele ,file="./RData/extraction_ele_PCAKmeans.RData")
+    load(file="./RData/extraction_ele_PCAKmeans.RData")
   }
   
   if(name_raster == PCA_Mclust)
   {
+    namefile <-  "PCA_Mclust"
     #**Extract the Climate Info
     #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     #save(extraction,file="./RData/extraction_clim_pca_Mclust.RData")
@@ -94,13 +101,18 @@ info_raster <- function (name_raster, menu)
     #**Extract the Soil Info
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil_PCAMCLUST.RData")
-    
     load(file="./RData/extraction_soil_PCAMCLUST.RData")
+    
+    #**Extract Elevation
+    #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    #save(extraction_ele ,file="./RData/extraction_ele_PCAMCLUST.RData")
+    load(file="./RData/extraction_ele_PCAMCLUST.RData")
     
    }
   
   if(name_raster == tnse_GNG)
   {
+    namefile <-  "tnse_GNG"
     #**Extract the Climate Info
     #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     #save(extraction,file="./RData/extraction_clim_tnse_GNG.RData")
@@ -111,15 +123,21 @@ info_raster <- function (name_raster, menu)
     #Extract the Soil Info
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
-    
     load(file="./RData/extraction_soil_PCAMCLUST.RData")
     
+        
+    #**Extract Elevation
+    #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction_ele ,file="./RData/extraction_ele_tnse_GNG.RData")
+    load(file="./RData/extraction_ele_tnse_GNG.RData")
   }
   
   
   if(menu == 1)
   {
-      
+  
+  name_var<- "Weather"
+  
   #Data Mean Anual 
   data_Tem_Mean_An <- data.frame(extraction%>%group_by(V68)%>%summarise(minTemMeanAnual=min(bio_1,na.rm=T),maxTemMeanAnual=max(bio_1,na.rm=T)))
   
@@ -267,6 +285,8 @@ info_raster <- function (name_raster, menu)
   
   if(menu == 2)
   {
+    
+    name_var<- "Soil"
     #Soil
     #clay
     data_clay <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_clay = mean(clay)))
@@ -288,11 +308,23 @@ info_raster <- function (name_raster, menu)
     result <- list (data_clay, data_sand, data_silt, data_watercapi )
     
   }
+  if(menu == 3)
+  {
+    
+    name_var<- "Elevation"
+    #Elevation
+    data_elevati <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Mean_Elev= mean(aspect_HondCholCop)))
+    
+    result <- data_elevati
+  }
+  
+    
+  
   
   #list   
   final_result <- do.call("cbind", result)
   final_result<- final_result [complete.cases(final_result), ]
-  
+  write.csv(final_result, paste0("./Excel_Files/AllVariables_",namefile,"_", name_var ".csv" ), row.names=F)
   return (final_result)
   
 }
