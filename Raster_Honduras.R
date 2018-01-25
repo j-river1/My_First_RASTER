@@ -1,6 +1,7 @@
 #Libraries
 library(raster)
 library(dplyr)
+library(ggplot2)
 
 #Folders 
 mainDir <- getwd()
@@ -274,11 +275,161 @@ info_raster <- function (name_raster, menu)
   #Data Mean Dic 
   data_pmean_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(PMean_Dic = mean(prec_12)))
   data_pmean_Dic$V68 <- NULL
+   
+  
+  #Data TMin January
+  data_tmin_jan <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_January = mean(tmin_1)))
+  data_tmin_jan$V68 <- NULL
+  
+  
+  
+  #Data TMin February
+  data_tmin_feb <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_February = mean(tmin_2)))
+  data_tmin_feb$V68 <- NULL
+  
+  
+  #Data TMin March 
+  data_tmin_marc <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_March = mean(tmin_3)))
+  data_tmin_marc$V68 <- NULL
+  
+  
+  #Data TMin April 
+  data_tmin_apri <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_April = mean(tmin_4)))
+  data_tmin_apri$V68 <- NULL
+  
+  
+  #Data TMin May 
+  data_tmin_may <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_May = mean(tmin_5)))
+  data_tmin_may$V68 <- NULL
+  
+  
+  #Data TMin June 
+  data_tmin_jun <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_June = mean(tmin_6)))
+  data_tmin_jun$V68 <- NULL
+  
+  
+  #Data TMin July 
+  data_tmin_jul <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_July = mean(tmin_7)))
+  data_tmin_jul$V68 <- NULL
+  
+  
+  #Data TMin Agust 
+  data_tmin_agus <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_Agust = mean(tmin_8)))
+  data_tmin_agus$V68 <- NULL
+  
+  
+  #Data TMin Sept 
+  data_tmin_sept <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_Sept = mean(tmin_9)))
+  data_tmin_sept$V68 <- NULL
+  
+  
+  #Data TMin Oct 
+  data_tmin_oct <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_Oct = mean(tmin_10)))
+  data_tmin_oct$V68 <- NULL
+  
+  
+  #Data TMin Nov 
+  data_tmin_Nov <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_Nov = mean(tmin_11)))
+  data_tmin_Nov$V68 <- NULL
+  
+  
+  #Data TMin Dic 
+  data_tmin_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(TMin_Dic = mean(tmin_12)))
+  data_tmin_Dic$V68 <- NULL
+  
+  
+  #Aca comienza
+  
+  
+  #Data TMax January
+  data_tmax_jan <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_January = mean(tmax_1)))
+  data_tmax_jan$V68 <- NULL
+  
+  
+  
+  #Data TMax February
+  data_tmax_feb <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_February = mean(tmax_2)))
+  data_tmax_feb$V68 <- NULL
+  
+  
+  #Data TMax March 
+  data_tmax_marc <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_March = mean(tmax_3)))
+  data_tmax_marc$V68 <- NULL
+  
+  
+  #Data TMax April 
+  data_tmax_apri <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_April = mean(tmax_4)))
+  data_tmax_apri$V68 <- NULL
+  
+  
+  #Data TMax May 
+  data_tmax_may <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_May = mean(tmax_5)))
+  data_tmax_may$V68 <- NULL
+  
+  
+  #Data TMax June 
+  data_tmax_jun <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_June = mean(tmax_6)))
+  data_tmax_jun$V68 <- NULL
+  
+  
+  #Data TMax July 
+  data_tmax_jul <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_July = mean(tmax_7)))
+  data_tmax_jul$V68 <- NULL
+  
+  
+  #Data TMax Agust 
+  data_tmax_agus <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_Agust = mean(tmax_8)))
+  data_tmax_agus$V68 <- NULL
+  
+  
+  #Data TMax Sept 
+  data_tmax_sept <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_Sept = mean(tmax_9)))
+  data_tmax_sept$V68 <- NULL
+  
+  
+  #Data TMax Oct 
+  data_tmax_oct <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_Oct = mean(tmax_10)))
+  data_tmax_oct$V68 <- NULL
+  
+  
+  #Data TMax Nov 
+  data_tmax_Nov <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_Nov = mean(tmax_11)))
+  data_tmax_Nov$V68 <- NULL
+  
+  
+  #Data TMean Dic 
+  data_tmax_Dic <- data.frame(extraction%>%group_by(V68)%>%summarise(TMax_Dic = mean(tmax_12)))
+  data_tmax_Dic$V68 <- NULL
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   result <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
                   data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic, data_pmean_jan, data_pmean_feb, data_pmean_marc, data_pmean_apri, data_pmean_may,
-                  data_pmean_jun, data_pmean_jul, data_pmean_agus, data_pmean_sept, data_pmean_oct, data_pmean_Nov, data_pmean_Dic )
+                  data_pmean_jun, data_pmean_jul, data_pmean_agus, data_pmean_sept, data_pmean_oct, data_pmean_Nov, data_pmean_Dic,
+                  data_tmin_jan, data_tmin_feb, data_tmin_marc, data_tmin_apri,  data_tmin_may, data_tmin_jun, data_tmin_jul, data_tmin_agus, data_tmin_sept,
+                  data_tmin_oct, data_tmin_Nov, data_tmin_Dic, data_tmax_jan, data_tmax_feb, data_tmax_marc, data_tmax_apri,  data_tmax_may, data_tmax_jun, data_tmax_jul, data_tmax_agus, 
+                  data_tmax_sept, data_tmax_oct, data_tmax_Nov, data_tmax_Dic                 
+                  )
   
   }
   
@@ -440,16 +591,41 @@ graphics_histo_temp <- function (method, numcluster, values_temp_min, values_tem
   data <- data.frame(Months = seq(1:12), Values_TX = as.numeric(values_temp_max), Values_TM = as.numeric(values_temp_min))
   
   
-  pdf(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
+  #pdf(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
   
   matrix_grap <- matrix(nrow=2, ncol=12)
   colnames(matrix_grap) <- months_aux
-  matrix_grap[1,] <- as.numeric((values_temp_max) 
-  matrix_grap[2,] <- as.numeric((values_temp_min)                               
-                                                                
-  barplot(matrix_grap, col= ("blue", "red"), names.arg= months_aux, ylab = "Grados Centigrados", cex.names=0.8, main = paste0("Histograma Temperaturas Máxima y Mínima del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
+  matrix_grap[1,] <- as.numeric((values_temp_max))
+  matrix_grap[2,] <- as.numeric((values_temp_min))    
+  
+  values_temp_max <- round(as.numeric((values_temp_max)), digits=0)
+  values_temp_min <- round(as.numeric((values_temp_min)), digits=0) 
+  
+  Mes <- c(months_aux, months_aux)
+  tempera_TX <- rep("Temperatura_Maxima", times = 12)
+  tempera_TM <- rep("Temperatura_Minima", times = 12)
+  both_tempe <- c(tempera_TX, tempera_TM )
+  
+  
+  Temperatura <- c(rep(both_tempe , times = 1))
+  months_aux_freq <- c(values_temp_max,values_temp_min)
+  Data <- data.frame(Mes, Temperatura, months_aux_freq)
+  #x[order(match(x, y))]
+  Data <- Data[order(match(Data$Mes, months_aux )),]
+  
+  
+  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5))
+  
+  #ggplot(Data, aes(x = Mes, y = months_aux_freq)) +geom_bar(aes(fill=Temperatura), stat = "identity") + geom_text(aes(label = months_aux_freq))
+  
+  
+  ggsave(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
 
-  dev.off()
+                                                                
+  #bar <- barplot(matrix_grap, col= c("red", "blue"), names.arg= months_aux, ylab = "Grados Centigrados", cex.names=0.8, main = paste0("Histograma Temperaturas Máxima y Mínima del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
+
+  #text(x = bar, y = matrix_grap[1,], label = matrix_grap[1,] , pos = 3, cex = 0.8, col = "red")
+  #dev.off()
 }
 
 
@@ -462,8 +638,8 @@ graph_all_station_TX_TM <- function (method)
 {
   
   
-  values_temp <- c("TMean_January", "TMean_February", "TMean_March", "TMean_April", "TMean_May", "TMean_June", "TMean_July", "TMean_Agust", "TMean_Sept", "TMean_Oct", "TMean_Nov", "TMean_Dic")
-  values_preci <- c("PMean_January", "PMean_February", "PMean_March", "PMean_April", "PMean_May", "PMean_June", "PMean_July", "PMean_Agust", "PMean_Sept", "PMean_Oct", "PMean_Nov", "PMean_Dic")
+  values_TX <- c("TMax_January", "TMax_February", "TMax_March", "TMax_April", "TMax_May", "TMax_June", "TMax_July", "TMax_Agust", "TMax_Sept", "TMax_Oct", "TMax_Nov", "TMax_Dic")
+  values_TM <- c("TMin_January", "TMin_February", "TMin_March", "TMin_April", "TMin_May", "TMin_June", "TMin_July", "TMin_Agust", "TMin_Sept", "TMin_Oct", "TMin_Nov", "TMin_Dic")
   
   
   #Graph ombrotermico
@@ -472,7 +648,7 @@ graph_all_station_TX_TM <- function (method)
   #Graph for each cluster
   for (i in 1:nrow(infoRaster))
   {
-    graphics_ombrothermic(method, i, infoRaster[i,values_temp], infoRaster[i,values_preci])
+    graphics_histo_temp (method, i, infoRaster[i,values_TM], infoRaster[i,values_TX])
     
     
   }
