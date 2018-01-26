@@ -613,19 +613,11 @@ graphics_histo_temp <- function (method, numcluster, values_temp_min, values_tem
   #x[order(match(x, y))]
   Data <- Data[order(match(Data$Mes, months_aux )),]
   
-  
-  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5))
-  
-  #ggplot(Data, aes(x = Mes, y = months_aux_freq)) +geom_bar(aes(fill=Temperatura), stat = "identity") + geom_text(aes(label = months_aux_freq))
-  
-  
+  Data <- within(Data, Mes <- factor(Mes, levels=(months_aux)))
+  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima","\n", "Método ", name_method, "\n", "Cluster ", numcluster)) +
+  theme(plot.title = element_text(hjust = 0.5))    
   ggsave(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
 
-                                                                
-  #bar <- barplot(matrix_grap, col= c("red", "blue"), names.arg= months_aux, ylab = "Grados Centigrados", cex.names=0.8, main = paste0("Histograma Temperaturas Máxima y Mínima del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
-
-  #text(x = bar, y = matrix_grap[1,], label = matrix_grap[1,] , pos = 3, cex = 0.8, col = "red")
-  #dev.off()
 }
 
 
