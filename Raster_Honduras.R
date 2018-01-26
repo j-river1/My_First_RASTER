@@ -2,6 +2,7 @@
 library(raster)
 library(dplyr)
 library(ggplot2)
+library(soiltexture)
 
 #Folders 
 mainDir <- getwd()
@@ -50,7 +51,7 @@ coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
 #***Read coordinatesExtract Soil***
 crsSystem=ClimeInfo@crs
-#soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem)
+soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected"))
 #save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
 load(file="./RData/soilsInfo_Projected.RData")
 
@@ -124,7 +125,7 @@ info_raster <- function (name_raster, menu)
     #Extract the Soil Info
     #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     #save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
-    load(file="./RData/extraction_soil_PCAMCLUST.RData")
+    load(file="./RData/extraction_soil_tnse_GNG.RData")
     
         
     #**Extract Elevation
