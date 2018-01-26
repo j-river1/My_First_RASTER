@@ -9,6 +9,7 @@ dir.create(file.path(mainDir, "RData"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Ombrothermic_Plots"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Excel_Files"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Histograms_Temperature_Max_Min"), showWarnings = FALSE) 
+dir.create(file.path(mainDir, "Triangle_Soil_Texture"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -638,7 +639,7 @@ graph_all_station_TX_TM <- function (method)
   infoRaster <- info_raster(method, 1)
   
   #Graph for each cluster
-  for (i in 1:nrow(infoRaster))
+  for (i in 1:(nrow(infoRaster)-1))
   {
     graphics_histo_temp (method, i, infoRaster[i,values_TM], infoRaster[i,values_TX])
     
@@ -651,8 +652,73 @@ graph_all_station_TX_TM <- function (method)
 
 
 
+#graphics_texture  plots histograms for texture soil
+#Argumetns   method. PCA_Kmean
+#                    PCA_Mclustst
+#                    tnse_GNG 
+
+graphics_texture <- function (method, numcluster, values_soil)
+{
+  
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+  }
+  
+  
+  #Data
+  data <- data.frame("CLAY"=as.numeric(values_soil)[1], "SILT"= as.numeric(values_soil)[3], "SAND"= as.numeric(values_soil)[2])
+  
+  
+  pdf(paste0("./Triangle_Soil_Texture/TriaTex_Cluster_",numcluster, "_",name_method ,".pdf"))
+  
+  
+  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+
+  dev.off()
+  
+}
+
+#graphics_texture  plots histograms for texture soil
+#Argumetns   method. PCA_Kmean
+#                    PCA_Mclustst
+#                    tnse_GNG 
 
 
+
+
+
+graph_all_texture_clus <- function (method)
+{
+  
+  
+  values_soil <- c("Mean_clay","Mean_sand","Mean_slit")
+
+  
+  #Graph ombrotermico
+  infoRaster <- info_raster(method, 2)
+  
+  #Graph for each cluster
+  for (i in 1:(nrow(infoRaster)-1))
+  {
+    graphics_texture(method, i, infoRaster[i,values_soil])
+    
+    
+  }
+  
+  
+  
+}
 
 
 
