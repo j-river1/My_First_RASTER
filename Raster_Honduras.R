@@ -55,7 +55,11 @@ soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInf
 #save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
 load(file="./RData/soilsInfo_Projected.RData")
 
+##############################################################BORRAR
+raster_info  <- raster(paste0(PCA_Kmeans, ".tif"))
 
+TEST=data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+data.frame(TEST%>%group_by(V2)%>%summarize(valorPr= mean(DEM_CholutecaCopan, na.rm=T)))
 
 #info_raster works for getting information of raster.
 #Arguments.  -name_raster.
@@ -465,7 +469,7 @@ info_raster <- function (name_raster, menu)
     
     name_var<- "Elevation"
     #Elevation
-    data_elevati <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Mean_Elev= mean(DEM_CholutecaCopan)))
+    data_elevati <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Mean_Elev= c(min(DEM_CholutecaCopan), max(DEM_CholutecaCopan))))
     
     result <- data_elevati
   }
@@ -479,9 +483,9 @@ info_raster <- function (name_raster, menu)
   colnames(final_result)[1]<-"GRIDCODE"
   
   #Measure the difference
-  measure_diff <- apply(final_result,2, sd)
-  final_result <- rbind(final_result, measure_diff)
-  final_result[nrow(final_result), 1] <- "SD"
+  #measure_diff <- apply(final_result,2, sd)
+  #final_result <- rbind(final_result, measure_diff)
+  #final_result[nrow(final_result), 1] <- "SD"
   
   write.csv(final_result, paste0("./Excel_Files/AllVariables_",namefile,"_", name_var, ".csv" ), row.names=F)
   return (final_result)
@@ -617,14 +621,14 @@ graphics_histo_temp <- function (method, numcluster, values_temp_min, values_tem
   
   Data <- within(Data, Mes <- factor(Mes, levels=(months_aux)))
   ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima","\n", "Método ", name_method, "\n", "Cluster ", numcluster)) +
-  theme(plot.title = element_text(hjust = 0.5))    
+  theme(plot.title = element_text(hjust = 0.5), axis.text.y=element_blank(), axis.ticks.y=element_blank())    
   ggsave(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
 
 }
 
 
 
-#Graph_all_station plots all clusters with ombrothermic plot
+#Graph_all_station plots all clusters with histogram
 #Arguments -table with all information
 
 
