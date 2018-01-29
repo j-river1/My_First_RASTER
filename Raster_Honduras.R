@@ -11,6 +11,8 @@ dir.create(file.path(mainDir, "Ombrothermic_Plots"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Excel_Files"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Histograms_Temperature_Max_Min"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Triangle_Soil_Texture"), showWarnings = FALSE) 
+dir.create(file.path(mainDir, "Temperature_Curve"), showWarnings = FALSE) 
+
 
 #3. tnse_GNG
 
@@ -411,24 +413,6 @@ info_raster <- function (name_raster, menu)
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   result <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
                   data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic, data_pmean_jan, data_pmean_feb, data_pmean_marc, data_pmean_apri, data_pmean_may,
                   data_pmean_jun, data_pmean_jul, data_pmean_agus, data_pmean_sept, data_pmean_oct, data_pmean_Nov, data_pmean_Dic,
@@ -469,9 +453,10 @@ info_raster <- function (name_raster, menu)
     
     name_var<- "Elevation"
     #Elevation
-    data_elevati <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Mean_Elev= c(min(DEM_CholutecaCopan), max(DEM_CholutecaCopan))))
-    
-    result <- data_elevati
+    data_elevati_min <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Min_Elev= min(DEM_CholutecaCopan)))
+    data_elevati_max <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Max_Elev= max(DEM_CholutecaCopan)))
+    data_elevati_max$V2 <- NULL
+    result <- list (data_elevati_min, data_elevati_max)
   }
   
     
@@ -522,7 +507,7 @@ graphics_ombrothermic <- function (method, numcluster, values_temp, values_preci
   data <- data.frame(Months = seq(1:12), Values_Preci = as.numeric(values_preci), Values_Temp = as.numeric(values_temp))
   
 
-  pdf(paste0("./Ombrothermic_Plots/Cluster_",numcluster, "_",name_method ,".pdf"))
+  jpeg(paste0("./Ombrothermic_Plots/Cluster_",numcluster, "_",name_method ,".jpg"), width = 7, height = 7, units = "in", res=90)
   par(mar=c(5,5,2,5))
   matrix_grap <- matrix(nrow=1, ncol=12)
   colnames(matrix_grap) <- months_aux
@@ -620,9 +605,18 @@ graphics_histo_temp <- function (method, numcluster, values_temp_min, values_tem
   Data <- Data[order(match(Data$Mes, months_aux )),]
   
   Data <- within(Data, Mes <- factor(Mes, levels=(months_aux)))
-  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima","\n", "Método ", name_method, "\n", "Cluster ", numcluster)) +
-  theme(plot.title = element_text(hjust = 0.5), axis.text.y=element_blank(), axis.ticks.y=element_blank())    
-  ggsave(paste0("./Histograms_Temperature_Max_Min/His_TXTM_Cluster_",numcluster, "_",name_method ,".pdf"))
+  
+  #Histograma sin legenda
+  #ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima ","\n", "Método ", name_method, "\n", "Cluster ", numcluster)) +
+  #theme(panel.background = element_blank())
+  
+  #Histograma con leyenda en el eje y
+  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima Promedio ","\n",  "Durantes los años 1997 - 2000\n", "Cluster " , numcluster)) +
+  theme(panel.background = element_blank())+ theme(plot.title = element_text(hjust = 0.5)) + theme(axis.line = element_line(colour = "black"))
+  
+  
+  #theme(plot.title = element_text(hjust = 0.5), axis.text.y=element_blank(), axis.ticks.y=element_blank())
+  ggsave(paste0("./Histograms_Temperature_Max_Min/His_TXTM_WithLAb_Cluster_",numcluster, "_",name_method ,".jpg"))
 
 }
 
@@ -644,7 +638,7 @@ graph_all_station_TX_TM <- function (method)
   infoRaster <- info_raster(method, 1)
   
   #Graph for each cluster
-  for (i in 1:(nrow(infoRaster)-1))
+  for (i in 1:(nrow(infoRaster)))
   {
     graphics_histo_temp (method, i, infoRaster[i,values_TM], infoRaster[i,values_TX])
     
@@ -685,7 +679,7 @@ graphics_texture <- function (method, numcluster, values_soil)
   data <- data.frame("CLAY"=as.numeric(values_soil)[1], "SILT"= as.numeric(values_soil)[3], "SAND"= as.numeric(values_soil)[2])
   
   
-  pdf(paste0("./Triangle_Soil_Texture/TriaTex_Cluster_",numcluster, "_",name_method ,".pdf"))
+  jpeg(paste0("./Triangle_Soil_Texture/TriaTex_Cluster_",numcluster, "_",name_method ,".jpg"), width = 7, height = 7, units = "in", res=90)
   
   
   TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
@@ -714,7 +708,7 @@ graph_all_texture_clus <- function (method)
   infoRaster <- info_raster(method, 2)
   
   #Graph for each cluster
-  for (i in 1:(nrow(infoRaster)-1))
+  for (i in 1:(nrow(infoRaster)))
   {
     graphics_texture(method, i, infoRaster[i,values_soil])
     
@@ -726,9 +720,81 @@ graph_all_texture_clus <- function (method)
 }
 
 
+#graphics_curve_temp  plots curves for temperature
+#Argumetns   method. PCA_Kmean
+#                    PCA_Mclustst
+#                    tnse_GNG 
+
+graphics_curve_temp <- function (method, numcluster, values_temp_min, values_temp_max)
+{
+  
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+  }
+  
+  
+  
+  values_temp_max <- round(as.numeric((values_temp_max)), digits=0)
+  values_temp_min <- round(as.numeric((values_temp_min)), digits=) 
+  
+  
+  
+  months_aux <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  data <- data.frame (Tipo_Temperatura = factor(c(rep(c("Temperatura_Máxima"), 12), rep(c("Temperatura_Mínima"), 12))),
+                      Mes = factor(rep(months_aux, 2), levels=months_aux ),
+                      Values= c(as.numeric(values_temp_max), as.numeric(values_temp_min))                      
+                      )
+                        
+  ggplot(data, aes(x=Mes, y=Values, group=Tipo_Temperatura, shape=Tipo_Temperatura)) + geom_line(aes(col=Tipo_Temperatura)) + geom_point(aes(col=Tipo_Temperatura)) + geom_text(aes(label=Values),hjust=0, vjust=0)     + 
+  ggtitle(paste0("Temperatura Máxima y Mínima Promedio ","\n",  "Desde el año 1970 hasta 2000\n", "Cluster " , numcluster))+  theme(panel.background = element_blank()) +
+  theme(plot.title = element_text(hjust = 0.5)) + labs(y = "Grados Centígrados")  + theme(axis.line = element_line(colour = "black"))
+  ggsave(paste0("./Temperature_Curve/Curve_TXTM_Cluster_",numcluster, "_",name_method ,".jpg"))                     
+                        
+
+
+return(data)
+  
+}
 
 
 
+#Graph_all_station plots all clusters with cruve
+#Arguments -table with all information
+
+
+graph_all_station_Curve_TX_TM <- function (method)
+{
+  
+  
+  values_TX <- c("TMax_January", "TMax_February", "TMax_March", "TMax_April", "TMax_May", "TMax_June", "TMax_July", "TMax_Agust", "TMax_Sept", "TMax_Oct", "TMax_Nov", "TMax_Dic")
+  values_TM <- c("TMin_January", "TMin_February", "TMin_March", "TMin_April", "TMin_May", "TMin_June", "TMin_July", "TMin_Agust", "TMin_Sept", "TMin_Oct", "TMin_Nov", "TMin_Dic")
+  
+  
+  #Graph ombrotermico
+  infoRaster <- info_raster(method, 1)
+  
+  #Graph for each cluster
+  for (i in 1:(nrow(infoRaster)))
+  {
+    graphics_curve_temp (method, i, infoRaster[i,values_TM], infoRaster[i,values_TX])
+    
+    
+  }
+  
+
+  
+}
 
 
 
