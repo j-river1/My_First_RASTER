@@ -13,6 +13,7 @@ dir.create(file.path(mainDir, "Histograms_Temperature_Max_Min"), showWarnings = 
 dir.create(file.path(mainDir, "Triangle_Soil_Texture"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Temperature_Curve"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Textura_Suelos_Excel"), showWarnings = FALSE) 
+dir.create(file.path(mainDir, "Textura_All_Cluster"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -532,7 +533,7 @@ graphics_ombrothermic <- function (method, numcluster, values_temp, values_preci
   matrix_grap[1,] <- as.numeric(values_preci) 
   #titulo obrometrico 
   #barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
-  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama de la Temperatura Promedio \n","Durantes los años 1970 - 2000\n", "Cluster " , numcluster), cex.main= 0.8 )
+  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama de la Temperatura Promedio"), cex.main= 1.5 )
   par(new = T)
   with(data, plot(Months, Values_Temp, type="b", pch=16,  axes=F, xlab=NA, ylab=NA, cex=1.2, col= "red", ylim = c(min(Values_Temp),max(Values_Temp))))
   #ylim= c(min(Values_Temp), max(Values_Temp))
@@ -631,7 +632,7 @@ graphics_histo_temp <- function (method, numcluster, values_temp_min, values_tem
   #theme(panel.background = element_blank())
   
   #Histograma con leyenda en el eje y
-  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima Promedio ","\n",  "Durantes los años 1970 - 2000\n", "Cluster " , numcluster)) +
+  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima Promedio")) +
   theme(panel.background = element_blank())+ theme(plot.title = element_text(hjust = 0.5)) + theme(axis.line = element_line(colour = "black"))
   
   
@@ -720,10 +721,6 @@ graphics_texture <- function (method, numcluster, values_soil)
 #                    PCA_Mclustst
 #                    tnse_GNG 
 
-
-
-
-
 graph_all_texture_clus <- function (method)
 {
   
@@ -784,8 +781,9 @@ graphics_curve_temp <- function (method, numcluster, values_temp_min, values_tem
                       )
                         
   ggplot(data, aes(x=Mes, y=Values, group=Tipo_Temperatura, shape=Tipo_Temperatura)) + geom_line(aes(col=Tipo_Temperatura)) + geom_point(aes(col=Tipo_Temperatura)) + geom_text(aes(label=Values),hjust=0, vjust=0)     + 
-  ggtitle(paste0("Temperatura Máxima y Mínima Promedio ","\n",  "Desde el año 1970 hasta 2000\n", "Cluster " , numcluster))+  theme(panel.background = element_blank()) +
-  theme(plot.title = element_text(hjust = 0.5)) + labs(y = "Grados Centígrados")  + theme(axis.line = element_line(colour = "black"))
+  ggtitle(paste0("Temperatura Máxima y Mínima Promedio"))+  theme(panel.background = element_blank()) +
+  theme(plot.title = element_text(hjust = 0.5)) + labs(y = "Grados Centígrados")  + theme(axis.line = element_line(colour = "black")) + 
+  theme(plot.title = element_text(size=22))
   ggsave(paste0("./Temperature_Curve/Curve_TXTM_Cluster_",numcluster, "_",name_method ,".jpg"))                     
                         
 
@@ -823,7 +821,7 @@ graph_all_station_Curve_TX_TM <- function (method)
   
 }
 
-out <- split( extraction_soil , f = extraction_soil$V5 )
+
 
 #texture_soil works for value texture of soil 
 
@@ -852,22 +850,23 @@ soil_texture <- function (method)
   
   #Getting the classication soil 
   
-  wer <- lapply(split_table, getting_texture)
+  wer <- lapply(split_table, getting_texture, method = name_method )
   
-  return(wer)
+  return(split_table )
   
 }
 
 #Getting_texture works for texture of soil
 #Arguments data.frame with three variables
 
-getting_texture <- function (table)
+getting_texture <- function (table, method)
 {
 
     #data with variables 
-    table <- data.frame  (CLAY = table$clay, SAND = table$sand, SILT = table$silt)
     cluster <- unique(table$V5)
+    table <- data.frame  (CLAY = table$clay, SAND = table$sand, SILT = table$silt)
     
+     
     #data with soil categroized
      soilText <- TT.points.in.classes(    
       tri.data = table,
@@ -891,14 +890,65 @@ getting_texture <- function (table)
     resultado <- merge(resumen, table_names)
     resultado <- resultado[order(-resultado[,2]),]
       
+    write.csv  (resultado, file = paste0("./Textura_Suelos_Excel/", method, "cluster_", cluster, ".csv"), row.names=FALSE)
+    
+    
+    return(cluster)
       
-    #resumen$TipoSuelo <- 
-    
-    return(resultado)
-  
-    
-    
-    
 }
+
+
+
+#graphics_texture_complete  plots histograms for texture soil
+#Argumetns   method. PCA_Kmean
+#                    PCA_Mclustst
+#                    tnse_GNG 
+
+graphics_texture_complete <- function (method,table)
+{
+  
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+  }
+  
+  
+  numcluster <- unique(table$V5)
+  
+  data <- data.frame("CLAY"=table$clay, "SILT"=table$silt, "SAND"=table$sand)
+  
+  
+  jpeg(paste0("./Textura_All_Cluster/TriaTex_Cluster_",numcluster, "_",name_method ,".jpg"), width = 7, height = 7, units = "in", res=90)
+  
+  #Name with cluster
+  #TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n",  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  dev.off()
+  
+}
+
+
+#graph_all_texture_complete
+
+graph_all_texture_complete <- function(method)
+{
+  
+  texture_all <- soil_texture (method)
+  
+  lapply(texture_all, graphics_texture_complete, method = method)
+
+}
+
+
 
 
