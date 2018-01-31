@@ -12,7 +12,7 @@ dir.create(file.path(mainDir, "Excel_Files"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Histograms_Temperature_Max_Min"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Triangle_Soil_Texture"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Temperature_Curve"), showWarnings = FALSE) 
-
+dir.create(file.path(mainDir, "Textura_Suelos_Excel"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -53,15 +53,11 @@ coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
 #***Read coordinatesExtract Soil***
 crsSystem=ClimeInfo@crs
-soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected"))
+soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected")
 #save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
 load(file="./RData/soilsInfo_Projected.RData")
 
-##############################################################BORRAR
-raster_info  <- raster(paste0(PCA_Kmeans, ".tif"))
 
-TEST=data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-data.frame(TEST%>%group_by(V2)%>%summarize(valorPr= mean(DEM_CholutecaCopan, na.rm=T)))
 
 #info_raster works for getting information of raster.
 #Arguments.  -name_raster.
@@ -431,21 +427,43 @@ info_raster <- function (name_raster, menu)
     #clay
     data_clay <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_clay = mean(clay)))
     
+    data_clay_max <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Max_clay = max(clay)))
+    data_clay_max$V5 <- NULL
     
+    data_clay_min <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Min_clay = min(clay)))
+    data_clay_min$V5 <- NULL
     
     #sand 
     data_sand <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_sand = mean(sand)))
     data_sand$V5 <- NULL
     
+    data_sand_max <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Max_sand = max(sand)))
+    data_sand_max$V5 <- NULL
+
+    data_sand_min <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Min_sand = min(sand)))
+    data_sand_min$V5 <- NULL
+    
     #silt 
     data_silt <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_slit = mean(silt)))
     data_silt$V5 <- NULL
+    
+    
+    data_silt_max <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Max_slit = max(silt)))
+    data_silt_max$V5 <- NULL
+    
+    data_silt_min <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Min_slit = min(silt)))
+    data_silt_min$V5 <- NULL
+    
+    
+    
     
     #watercapi 
     data_watercapi <- data.frame(extraction_soil%>%group_by(V5)%>%summarise(Mean_water_capi = mean(water_holding_capacity)))
     data_watercapi$V5 <- NULL
     
-    result <- list (data_clay, data_sand, data_silt, data_watercapi )
+   
+  
+    result <- list (data_clay, data_sand, data_silt, data_watercapi, data_sand_max,  data_sand_min, data_silt_max, data_silt_min, data_clay_max, data_clay_min)
     
   }
   if(menu == 3)
@@ -512,7 +530,9 @@ graphics_ombrothermic <- function (method, numcluster, values_temp, values_preci
   matrix_grap <- matrix(nrow=1, ncol=12)
   colnames(matrix_grap) <- months_aux
   matrix_grap[1,] <- as.numeric(values_preci) 
-  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
+  #titulo obrometrico 
+  #barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama Ombrotérmico del cluster ", numcluster, "\n", name_method ), cex.main= 0.8 )
+  barplot(as.numeric(values_preci), col= "blue", names.arg= months_aux, ylim= c(0, max(values_preci)), ylab = "Mililitros", cex.names=0.8, main = paste0("Diagrama de la Temperatura Promedio \n","Durantes los años 1970 - 2000\n", "Cluster " , numcluster), cex.main= 0.8 )
   par(new = T)
   with(data, plot(Months, Values_Temp, type="b", pch=16,  axes=F, xlab=NA, ylab=NA, cex=1.2, col= "red", ylim = c(min(Values_Temp),max(Values_Temp))))
   #ylim= c(min(Values_Temp), max(Values_Temp))
@@ -611,7 +631,7 @@ graphics_histo_temp <- function (method, numcluster, values_temp_min, values_tem
   #theme(panel.background = element_blank())
   
   #Histograma con leyenda en el eje y
-  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima Promedio ","\n",  "Durantes los años 1997 - 2000\n", "Cluster " , numcluster)) +
+  ggplot(Data, aes(x = Mes, y = months_aux_freq, fill = Temperatura, label = months_aux_freq)) +geom_bar(stat = "identity") + geom_text(size = 3,  position = position_stack(vjust = 0.5)) + labs(y = "Grados Centígrados") + ggtitle(paste0("Histograma Temperatura Máxima y Mínima Promedio ","\n",  "Durantes los años 1970 - 2000\n", "Cluster " , numcluster)) +
   theme(panel.background = element_blank())+ theme(plot.title = element_text(hjust = 0.5)) + theme(axis.line = element_line(colour = "black"))
   
   
@@ -674,16 +694,23 @@ graphics_texture <- function (method, numcluster, values_soil)
     name_method <- "tnse_GNG"
   }
   
+  #names_soil <- c("Mean_clay","Mean_sand","Mean_slit","Max_sand",  "Min_sand", "Max_slit", "Min_slit", "Max_clay", "Min_clay")
+  #values_soil <- values_soil[names_soil]
+  
+  
   
   #Data
+  
+  #data <- data.frame("CLAY"=as.numeric(values_soil)[c(1, 8, 9)], "SILT"= as.numeric(values_soil)[c(3, 6, 7)], "SAND"= as.numeric(values_soil)[c(2,4, 5)])
+  
   data <- data.frame("CLAY"=as.numeric(values_soil)[1], "SILT"= as.numeric(values_soil)[3], "SAND"= as.numeric(values_soil)[2])
   
   
   jpeg(paste0("./Triangle_Soil_Texture/TriaTex_Cluster_",numcluster, "_",name_method ,".jpg"), width = 7, height = 7, units = "in", res=90)
   
-  
-  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
-
+  #Name with cluster
+  #TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n",  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
   dev.off()
   
 }
@@ -701,7 +728,7 @@ graph_all_texture_clus <- function (method)
 {
   
   
-  values_soil <- c("Mean_clay","Mean_sand","Mean_slit")
+  values_soil <- c("Mean_clay","Mean_sand","Mean_slit","Max_sand",  "Min_sand", "Max_slit", "Min_slit", "Max_clay", "Min_clay")
 
   
   #Graph ombrotermico
@@ -796,6 +823,82 @@ graph_all_station_Curve_TX_TM <- function (method)
   
 }
 
+out <- split( extraction_soil , f = extraction_soil$V5 )
 
+#texture_soil works for value texture of soil 
+
+soil_texture <- function (method)
+{
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+    load(file="./RData/extraction_soil.RData")
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+    load(file="./RData/extraction_soil_PCAMCLUST.RData")
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+    load(file="./RData/extraction_soil_tnse_GNG.RData")
+  }
+  
+  #Split the table 
+  split_table <- split( extraction_soil , f = extraction_soil$V5 )
+  
+  #Getting the classication soil 
+  
+  wer <- lapply(split_table, getting_texture)
+  
+  return(wer)
+  
+}
+
+#Getting_texture works for texture of soil
+#Arguments data.frame with three variables
+
+getting_texture <- function (table)
+{
+
+    #data with variables 
+    table <- data.frame  (CLAY = table$clay, SAND = table$sand, SILT = table$silt)
+    cluster <- unique(table$V5)
+    
+    #data with soil categroized
+     soilText <- TT.points.in.classes(    
+      tri.data = table,
+      class.sys =  "USDA.TT",
+      PiC.type = "t"
+      )
+    
+    #Table
+    resumen <- as.data.frame(table(soilText))
+    
+    #Names
+    names(resumen) <- c("Siglas", "NumeroMuestras") 
+ 
+    
+    #data with variables 
+    table_names <- data.frame  (Siglas = c("Cl", "SaCl", "SaClLo", "SaC", "LoSa", "SaLo", "Lo","SiLo", "Si", "ClLo") , 
+                                Textura = c("Arcilla", "Arcilloso_Arenoso", "Franco_Arcilloso_Arenoso",
+                                             "Arena","Arena_Franca","Franco_Arenoso","Franco", "Franco_Limoso",
+                                             "Limo","Franco_Arcilloso" ))
+    
+    resultado <- merge(resumen, table_names)
+    resultado <- resultado[order(-resultado[,2]),]
+      
+      
+    #resumen$TipoSuelo <- 
+    
+    return(resultado)
+  
+    
+    
+    
+}
 
 
