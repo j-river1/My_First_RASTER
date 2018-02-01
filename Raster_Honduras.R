@@ -3,6 +3,7 @@ library(raster)
 library(dplyr)
 library(ggplot2)
 library(soiltexture)
+library(scales)
 
 #Folders 
 mainDir <- getwd()
@@ -14,6 +15,8 @@ dir.create(file.path(mainDir, "Triangle_Soil_Texture"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Temperature_Curve"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Textura_Suelos_Excel"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Textura_All_Cluster"), showWarnings = FALSE) 
+dir.create(file.path(mainDir, "Histogramas_Elevation"), showWarnings = FALSE) 
+
 
 #3. tnse_GNG
 
@@ -143,9 +146,18 @@ info_raster <- function (name_raster, menu)
   
   name_var<- "Weather"
   
-  #Data Mean Anual 
-  data_Tem_Mean_An <- data.frame(extraction%>%group_by(V68)%>%summarise(minTemMeanAnual=min(bio_1,na.rm=T),maxTemMeanAnual=max(bio_1,na.rm=T)))
   
+  
+  #Data Mean Anual
+  data_Tem_Mean<- data.frame(extraction%>%group_by(V68)%>%summarise(TemMeanAnual=mean(bio_1,na.rm=T)))
+
+  
+  
+  
+  
+  #Data Mean Max an Min Anual 
+  data_Tem_Mean_An <- data.frame(extraction%>%group_by(V68)%>%summarise(minTemMeanAnual=min(bio_1,na.rm=T),maxTemMeanAnual=max(bio_1,na.rm=T)))
+  data_Tem_Range_Mon$V68 <- NULL
     
   #Data Temperature Monthly Range
   data_Tem_Range_Mon <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Monthly_Range = mean(bio_2)))
@@ -410,7 +422,7 @@ info_raster <- function (name_raster, menu)
   
   
   
-  result <- list (data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
+  result <- list (data_Tem_Mean, data_Tem_Mean_An , data_Tem_Range_Mon, data_Tem_Range_An_Range,data_Precip, data_tmean_jan, data_tmean_feb, data_tmean_marc,  data_tmean_apri, data_tmean_may , data_tmean_jun, 
                   data_tmean_jul, data_tmean_agus, data_tmean_sept, data_tmean_oct, data_tmean_Nov, data_tmean_Dic, data_pmean_jan, data_pmean_feb, data_pmean_marc, data_pmean_apri, data_pmean_may,
                   data_pmean_jun, data_pmean_jul, data_pmean_agus, data_pmean_sept, data_pmean_oct, data_pmean_Nov, data_pmean_Dic,
                   data_tmin_jan, data_tmin_feb, data_tmin_marc, data_tmin_apri,  data_tmin_may, data_tmin_jun, data_tmin_jul, data_tmin_agus, data_tmin_sept,
@@ -471,11 +483,16 @@ info_raster <- function (name_raster, menu)
   {
     
     name_var<- "Elevation"
-    #Elevation
+    #Range Elevation
     data_elevati_min <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Min_Elev= min(DEM_CholutecaCopan)))
     data_elevati_max <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(Max_Elev= max(DEM_CholutecaCopan)))
     data_elevati_max$V2 <- NULL
-    result <- list (data_elevati_min, data_elevati_max)
+    
+    #More Frequently
+    data_elevati_more_fr <- data.frame(extraction_ele%>%group_by(V2)%>%summarise(More_Freq= names(which.max(table(DEM_CholutecaCopan)))))
+    data_elevati_more_fr$V2 <- NULL
+    
+    result <- list (data_elevati_min, data_elevati_max, data_elevati_more_fr )
   }
   
     
@@ -711,7 +728,10 @@ graphics_texture <- function (method, numcluster, values_soil)
   
   #Name with cluster
   #TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
-  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n",  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  #TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n",  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n"), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  
+  
   dev.off()
   
 }
@@ -889,6 +909,8 @@ getting_texture <- function (table, method)
     
     resultado <- merge(resumen, table_names)
     resultado <- resultado[order(-resultado[,2]),]
+    resultado$Total <- percent(round(resultado$NumeroMuestras/sum(resultado$NumeroMuestras), digits = 2))
+    resultado <- resultado[c("Siglas", "Textura", "NumeroMuestras", "Total")]
       
     write.csv  (resultado, file = paste0("./Textura_Suelos_Excel/", method, "cluster_", cluster, ".csv"), row.names=FALSE)
     
@@ -932,7 +954,9 @@ graphics_texture_complete <- function (method,table)
   
   #Name with cluster
   #TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo", "\n", name_method,  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
-  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n",  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  #TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo\n",  " Cluster_", numcluster), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  TT.plot(class.sys = "USDA.TT",tri.data = data ,main = paste0("Diagrama Textura del Suelo"), col = "blue", lang = "es", cex.axis= 0.8, cex.lab= 0.8, class.p.bg.col = TRUE)
+  
   dev.off()
   
 }
@@ -951,4 +975,93 @@ graph_all_texture_complete <- function(method)
 
 
 
+#texture_soil works for elevation data 
+
+elevation_info <- function (method)
+{
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+    load(file="./RData/extraction_ele_PCAKmeans.RData")
+
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+    load(file="./RData/extraction_ele_PCAMCLUST.RData")
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+    load(file="./RData/extraction_ele_tnse_GNG.RData")
+  }
+  
+  
+  
+  #Split the table 
+  split_table <- split( extraction_ele , f = extraction_ele$V2 )
+  
+  #Getting the classication soil 
+  
+  #wer <- lapply(split_table, getting_texture, method = name_method )
+  
+  return(split_table )
+  
+}
+
+#graphics_texture_complete  plots histograms for texture soil
+#Argumetns   method. PCA_Kmean
+#                    PCA_Mclustst
+#                    tnse_GNG 
+
+graphics_bar_plots_elevation <- function (method,table)
+{
+  
+  if(method == PCA_Kmeans)
+  {
+    name_method <- "PCA_Kmeans"
+  }
+  
+  if(method == PCA_Mclust)
+  {
+    name_method <- "PCA_Mclust"
+  }
+  
+  if(method == tnse_GNG)
+  {
+    name_method <- "tnse_GNG"
+  }
+  
+  
+  numcluster <- unique(table$V2)
+  
+  data <- data.frame("Elevacion"= table$DEM_CholutecaCopan )
+    
+  
+  #jpeg(paste0("./Histogramas_Elevation/Elevation_Cluster_",numcluster, "_",name_method ,".jpg"), width = 7, height = 7, units = "in", res=90)  
+  #Name with histogramas
+  
+  
+  ggplot(data, aes(x=Elevacion, fill=cut(Elevacion, 100))) + geom_histogram(bins=30, show.legend=FALSE) + ggtitle(paste0("Distribución Elevación"))+  theme(panel.background = element_blank()) +
+  theme(axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) + coord_flip() + labs(x = "Metros", y = "Frecuencia") 
+  
+  ggsave(paste0("./Histogramas_Elevation/Elevation_Cluster_",numcluster, "_",name_method ,".jpg"))  
+
+  
+  return(data)
+}
+
+
+#graph_all_elevation_complete
+
+graph_all_elevation_complete <- function(method)
+{
+  
+  elevation_all <- elevation_info(method)
+  
+  lapply(elevation_all, graphics_bar_plots_elevation, method = method)
+  
+}
 
