@@ -157,7 +157,7 @@ info_raster <- function (name_raster, menu)
   
   #Data Mean Max an Min Anual 
   data_Tem_Mean_An <- data.frame(extraction%>%group_by(V68)%>%summarise(minTemMeanAnual=min(bio_1,na.rm=T),maxTemMeanAnual=max(bio_1,na.rm=T)))
-  data_Tem_Range_Mon$V68 <- NULL
+  data_Tem_Mean_An$V68 <- NULL
     
   #Data Temperature Monthly Range
   data_Tem_Range_Mon <- data.frame(extraction%>%group_by(V68)%>%summarise(Mean_Monthly_Range = mean(bio_2)))
