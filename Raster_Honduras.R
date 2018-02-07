@@ -16,7 +16,7 @@ dir.create(file.path(mainDir, "Temperature_Curve"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Textura_Suelos_Excel"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Textura_All_Cluster"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Histogramas_Elevation"), showWarnings = FALSE) 
-
+dir.create(file.path(mainDir, "Data_Final"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -26,12 +26,31 @@ PCA_Mclust ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/
 tnse_GNG ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_gng_tsne_RedcVariables_Norm_per270_NClu14"
 
 
+#Cluster of 3 5 and 11 
+
+PCA_3 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Choluteca/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu3"
+PCA_5 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Choluteca/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu5"
+PCA_11 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Choluteca/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu11"
+
+
+
+#OJo reemplazo de variables.
+
+PCA_Kmeans <- PCA_3 
+PCA_Mclust <- PCA_5
+tnse_GNG <- PCA_11
+
+
+
+
+
 #***Weather Raster Folders***
 
 VectorFile="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/SHP_File"
 ElevationFile="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Elevacion/"
 SoilFiles="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Suelo/"
 ClimeFiles="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Clima/WorldClim"
+
 
 #***Read Raster Weather***
 
@@ -51,7 +70,7 @@ setwd(mainDir)
 
 #***Read coordinatesExtract Weather***
 
-rasterRef=ClimeInfo$bio_10
+rasterRef=raster("//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_mclust_PCA_RedcVariables_Norm_dim11_NClu21.tif")
 levelsWNA=which(!is.na(rasterRef[]))
 coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
@@ -80,7 +99,9 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == PCA_Kmeans)
   { 
-    namefile <-  "PCA_Kmeans"
+    #namefile <-  "PCA_Kmeans"
+    
+    namefile <-  "PCA_Kmeans_3Cluster"
     #**Extract the Climate Info
     #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     #save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
@@ -100,7 +121,8 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == PCA_Mclust)
   {
-    namefile <-  "PCA_Mclust"
+    #namefile <-  "PCA_Mclust"
+    namefile <-  "PCA_Kmeans_5Cluster"
     #**Extract the Climate Info
     #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     #save(extraction,file="./RData/extraction_clim_pca_Mclust.RData")
@@ -120,7 +142,9 @@ info_raster <- function (name_raster, menu)
   
   if(name_raster == tnse_GNG)
   {
-    namefile <-  "tnse_GNG"
+    #namefile <-  "tnse_GNG"
+    #namefile <-  "tnse_GNG_11Cluster"
+    namefile <-  "PCA_Kmeans_11Cluster"
     #**Extract the Climate Info
     #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     #save(extraction,file="./RData/extraction_clim_tnse_GNG.RData")
