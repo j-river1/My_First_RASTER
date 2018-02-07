@@ -17,6 +17,7 @@ dir.create(file.path(mainDir, "Textura_Suelos_Excel"), showWarnings = FALSE)
 dir.create(file.path(mainDir, "Textura_All_Cluster"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Histogramas_Elevation"), showWarnings = FALSE) 
 dir.create(file.path(mainDir, "Data_Final"), showWarnings = FALSE) 
+dir.create(file.path(mainDir, "Elevation_Data"), showWarnings = FALSE) 
 
 #3. tnse_GNG
 
@@ -1005,20 +1006,25 @@ elevation_info <- function (method)
 {
   if(method == PCA_Kmeans)
   {
-    name_method <- "PCA_Kmeans"
+    #name_method <- "PCA_Kmeans"
+    name_method <- "PCA_Kmeans_3Clus"
+    
     load(file="./RData/extraction_ele_PCAKmeans.RData")
 
   }
   
   if(method == PCA_Mclust)
   {
-    name_method <- "PCA_Mclust"
+    
+    #name_method <- "PCA_Mclust"
+    name_method <- "PCA_Kmeans_5Clus"
     load(file="./RData/extraction_ele_PCAMCLUST.RData")
   }
   
   if(method == tnse_GNG)
   {
-    name_method <- "tnse_GNG"
+    name_method <- "PCA_Kmeans_11Clus"
+    #name_method <- "tnse_GNG"
     load(file="./RData/extraction_ele_tnse_GNG.RData")
   }
   
@@ -1030,7 +1036,8 @@ elevation_info <- function (method)
   #Getting the classication soil 
   
   #wer <- lapply(split_table, getting_texture, method = name_method )
-  
+  #write.csv  (split_table, file = paste0("./Elevation_Data/", name_method , ".csv"), row.names=FALSE)
+  #capture.output(split_table, file = paste0("./Elevation_Data/", name_method , ".csv"))
   return(split_table )
   
 }
@@ -1045,29 +1052,31 @@ graphics_bar_plots_elevation <- function (method,table)
   
   if(method == PCA_Kmeans)
   {
-    name_method <- "PCA_Kmeans"
+    #name_method <- "PCA_Kmeans"
+    name_method <- "PCA_Kmeans_3Clus"
   }
   
   if(method == PCA_Mclust)
   {
-    name_method <- "PCA_Mclust"
+    #name_method <- "PCA_Mclust"
+    name_method <- "PCA_Kmeans_5Clus"
   }
   
   if(method == tnse_GNG)
   {
-    name_method <- "tnse_GNG"
+    #name_method <- "tnse_GNG"
+    name_method <- "PCA_Kmeans_11Clus"
   }
   
   
   numcluster <- unique(table$V2)
-  
-  data <- data.frame("Elevacion"= table$DEM_CholutecaCopan )
+  data <- data.frame("Elevacion"= table$DEM_CholutecaCopan, "Cluster"= numcluster)
     
   
   #jpeg(paste0("./Histogramas_Elevation/Elevation_Cluster_",numcluster, "_",name_method ,".jpg"), width = 7, height = 7, units = "in", res=90)  
   #Name with histogramas
   
-  
+  write.csv  (data, file = paste0("./Elevation_Data/", name_method , "_", numcluster,".csv"), row.names=FALSE)
   ggplot(data, aes(x=Elevacion, fill=cut(Elevacion, 100))) + geom_histogram(bins=30, show.legend=FALSE) + ggtitle(paste0("Distribución Elevación"))+  theme(panel.background = element_blank()) +
   theme(axis.line = element_line(colour = "black")) + theme(plot.title = element_text(hjust = 0.5)) + coord_flip() + labs(x = "Metros", y = "Frecuencia") 
   
