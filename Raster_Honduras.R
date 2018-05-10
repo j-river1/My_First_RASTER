@@ -1,9 +1,13 @@
+
+rm(list=ls()) 
+
 #Libraries
 library(raster)
 library(dplyr)
 library(ggplot2)
 library(soiltexture)
 library(scales)
+library(here)
 
 #Folders 
 mainDir <- getwd()
@@ -21,17 +25,16 @@ dir.create(file.path(mainDir, "Elevation_Data"), showWarnings = FALSE)
 
 #3. tnse_GNG
 
-
-PCA_Kmeans ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu13"
-PCA_Mclust ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_mclust_PCA_RedcVariables_Norm_dim11_NClu21"
-tnse_GNG ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_gng_tsne_RedcVariables_Norm_per270_NClu14"
+#PCA_Kmeans <- "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Clasificacion_no_supervisada/results/pca_kmeans_copan/Map_kmeans_PCA_RedcVariables_Norm_dim10_NClu3"
+#PCA_Mclust ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_mclust_PCA_RedcVariables_Norm_dim11_NClu21"
+#tnse_GNG ="//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_gng_tsne_RedcVariables_Norm_per270_NClu14"
 
 
 #Cluster of 3 5 and 11 
 
-PCA_3 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Choluteca/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu3"
-PCA_5 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Choluteca/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu5"
-PCA_11 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Choluteca/Raster_kmeans_PCA_RedcVariables_Norm_dim11_NClu11"
+PCA_3 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Clasificacion_no_supervisada/results/pca_kmeans_copan/Map_kmeans_PCA_RedcVariables_Norm_dim10_NClu3"
+PCA_5 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Clasificacion_no_supervisada/results/pca_kmeans_copan/Map_kmeans_PCA_RedcVariables_Norm_dim10_NClu5"
+PCA_7 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/Clasificacion_no_supervisada/results/pca_kmeans_copan/Map_kmeans_PCA_RedcVariables_Norm_dim10_NClu7"
 
 
 
@@ -39,7 +42,7 @@ PCA_11 = "//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Cho
 
 PCA_Kmeans <- PCA_3 
 PCA_Mclust <- PCA_5
-tnse_GNG <- PCA_11
+tnse_GNG <- PCA_7
 
 
 
@@ -77,7 +80,7 @@ coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
 #***Read coordinatesExtract Soil***
 crsSystem=ClimeInfo@crs
-soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected")
+soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected", overwrite=TRUE)
 #save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
 load(file="./RData/soilsInfo_Projected.RData")
 
@@ -125,18 +128,18 @@ info_raster <- function (name_raster, menu)
     #namefile <-  "PCA_Mclust"
     namefile <-  "PCA_Kmeans_5Cluster"
     #**Extract the Climate Info
-    #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    #save(extraction,file="./RData/extraction_clim_pca_Mclust.RData")
+    extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction,file="./RData/extraction_clim_pca_Mclust.RData")
     load(file="./RData/extraction_clim_pca_Mclust.RData")
     
     #**Extract the Soil Info
-    #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
-    #save(extraction_soil ,file="./RData/extraction_soil_PCAMCLUST.RData")
+    extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+    save(extraction_soil ,file="./RData/extraction_soil_PCAMCLUST.RData")
     load(file="./RData/extraction_soil_PCAMCLUST.RData")
     
     #**Extract Elevation
-    #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    #save(extraction_ele ,file="./RData/extraction_ele_PCAMCLUST.RData")
+    extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction_ele ,file="./RData/extraction_ele_PCAMCLUST.RData")
     load(file="./RData/extraction_ele_PCAMCLUST.RData")
     
    }
@@ -145,23 +148,23 @@ info_raster <- function (name_raster, menu)
   {
     #namefile <-  "tnse_GNG"
     #namefile <-  "tnse_GNG_11Cluster"
-    namefile <-  "PCA_Kmeans_11Cluster"
+    namefile <-  "PCA_Kmeans_7Cluster"
     #**Extract the Climate Info
-    #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    #save(extraction,file="./RData/extraction_clim_tnse_GNG.RData")
+    extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction,file="./RData/extraction_clim_tnse_GNG.RData")
     load(file="./RData/extraction_clim_tnse_GNG.RData")
     
     
     
     #Extract the Soil Info
-    #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
-    #save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
+    extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+    save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
     load(file="./RData/extraction_soil_tnse_GNG.RData")
     
         
     #**Extract Elevation
-    #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    #save(extraction_ele ,file="./RData/extraction_ele_tnse_GNG.RData")
+    extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction_ele ,file="./RData/extraction_ele_tnse_GNG.RData")
     load(file="./RData/extraction_ele_tnse_GNG.RData")
   }
   
@@ -534,7 +537,40 @@ info_raster <- function (name_raster, menu)
   #final_result[nrow(final_result), 1] <- "SD"
   
   write.csv(final_result, paste0("./Excel_Files/AllVariables_",namefile,"_", name_var, ".csv" ), row.names=F)
-  return (final_result)
+  #return (final_result)
+  
+  #Numeber of cluster 
+  #Dummy variable
+  
+  months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+  cluster <- max(na.omit(values(raster_info)))
+  sequen <- seq(1, cluster)
+  
+  
+  Mes <- rep(months, cluster)[order(match(rep(months, cluster), months))]
+  IDCluster <- rep(cluster, length(Mes))
+  N_Cluster <- rep(sequen, 12)
+  P_mean <- c(final_result$PMean_January, final_result$PMean_February, final_result$PMean_March, final_result$PMean_April,
+              final_result$PMean_May, final_result$PMean_June, final_result$PMean_July, final_result$PMean_Agust, 
+              final_result$PMean_Sept, final_result$PMean_Oct, final_result$PMean_Nov, final_result$PMean_Nov)
+  
+  T_max <- c(final_result$TMax_January, final_result$TMax_February,final_result$TMax_March,final_result$TMax_April,
+             final_result$TMax_May, final_result$TMax_June, final_result$TMax_July, final_result$TMax_Agust, 
+             final_result$TMax_Sept, final_result$TMax_Oct, final_result$TMax_Nov, final_result$TMax_Nov )
+  
+  
+  T_min <-  c(final_result$TMin_January, final_result$TMin_February,final_result$TMin_March,final_result$TMin_April,
+              final_result$TMin_May, final_result$TMin_June, final_result$TMin_July, final_result$TMin_Agust, 
+              final_result$TMin_Sept, final_result$TMin_Oct, final_result$TMin_Nov, final_result$TMin_Nov )
+  
+  T_mean <- c(final_result$TMean_January, final_result$TMean_February,final_result$TMean_March,final_result$TMean_April,
+              final_result$TMean_May, final_result$TMean_June, final_result$TMean_July, final_result$TMean_Agust, 
+              final_result$TMean_Sept, final_result$TMean_Oct, final_result$TMean_Nov, final_result$TMean_Nov )
+  
+  tableu_format <- data.frame(Mes=Mes, IDCluster=IDCluster, N_Cluster=N_Cluster , P_mean=P_mean, T_max=T_max, T_mean=T_mean, T_min=T_min)
+  write.csv(tableu_format, file = paste0(here(), "/Excel_files/", namefile, "_Tableu", ".csv"), row.names=FALSE )
+  return(tableu_format)
+  
   
 }
 
@@ -1097,4 +1133,120 @@ graph_all_elevation_complete <- function(method)
   lapply(elevation_all, graphics_bar_plots_elevation, method = method)
   
 }
+
+
+#variable for read
+
+values_TX <- c("GRIDCODE", "TMax_January", "TMax_February", "TMax_March", "TMax_April", "TMax_May", "TMax_June", "TMax_July", "TMax_Agust", "TMax_Sept", "TMax_Oct", "TMax_Nov", "TMax_Dic")
+values_TM <- c("GRIDCODE","TMin_January", "TMin_February", "TMin_March", "TMin_April", "TMin_May", "TMin_June", "TMin_July", "TMin_Agust", "TMin_Sept", "TMin_Oct", "TMin_Nov", "TMin_Dic")
+values_temp <- c("GRIDCODE", "TMean_January", "TMean_February", "TMean_March", "TMean_April", "TMean_May", "TMean_June", "TMean_July", "TMean_Agust", "TMean_Sept", "TMean_Oct", "TMean_Nov", "TMean_Dic")
+values_preci <- c("GRIDCODE", "PMean_January", "PMean_February", "PMean_March", "PMean_April", "PMean_May", "PMean_June", "PMean_July", "PMean_Agust", "PMean_Sept", "PMean_Oct", "PMean_Nov", "PMean_Dic")
+
+
+
+#Read files
+#Arguments - method
+#            tsne_gng
+#            pca_mcluster
+#            pca_kmeans
+#Weather variables    -Weather   1
+#                     -Soil      2
+#                     -Elevation 3
+#variable to graph
+#values_Tx  1
+#values_TM  2
+#values_temp 3
+#values_predci 4
+
+#Setwd must be path of directory of main code
+
+
+#Number of cluster
+
+plot <- function(method, method_variables)
+{
+  
+  if(method=="pca_kmeans")
+  {
+    if(method_variables == 2)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_PCA_Kmeans_Soil.csv"))
+      
+      tabla_TX <- tabla[, values_TX] 
+      
+    }
+    
+    if(method_variables == 1)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_PCA_Kmeans_Weather.csv"))
+      
+      tabla_TX <- tabla[, values_TX]
+      
+      #Choose cluster
+      tabla_TX  <- tabla_TX[which(tabla_TX$GRIDCODE==files_tsn_gng),]
+      #tabla_TX <- as.data.frame(tabla_TX)
+      
+      #data_TX <-data.frame(Months=seq(1:12), Cluster_2 = as.numeric(tabla_TX[2,]) , Cluster_3=as.numeric(tabla_TX[3,]), Cluster_4=as.numeric(tabla_TX[4,]), Cluster_6=as.numeric(tabla_TX[6,]), 
+      #                     Cluster_7=as.numeric(tabla_TX[7,]), Cluster_9=as.numeric(tabla_TX[9,]), Cluster_10=as.numeric(tabla_TX[10,]), Cluster_11=as.numeric(tabla_TX[11,]) ,Cluster_12=as.numeric(tabla_TX[12,]), Cluster_13=as.numeric(tabla_TX[13,]), Cluster_14=as.numeric(tabla_TX[14,])) 
+      
+      #ggplot(tabla_TX, aes(x=Months, y=values_TX))
+      
+    }
+    
+    
+    if(method_variables == 3)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_PCA_Kmeans_Elevation.csv"))
+    }
+    
+  }
+  
+  if(method=="pca_mcluster")
+  {
+    if(method_variables == 2)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_PCA_Mclust_Soil.csv"))
+    }
+    
+    if(method_variables == 1)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_PCA_Mclust_Weather.csv"))
+    }
+    
+    
+    if(method_variables == 3)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_PCA_Mclust_Elevation.csv"))
+    }
+    
+  }
+  
+  
+  if(method=="tsne_gng")
+  {
+    if(method_variables == 2)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_tnse_GNG_Soil.csv"))
+    }
+    
+    if(method_variables == 1)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_tnse_GNG_Weather.csv"))
+    }
+    
+    
+    if(method_variables == 3)
+    {
+      tabla <- read.csv(paste0(getwd(),"/Excel_Files/AllVariables_tnse_GNG_Elevation.csv"))
+    }
+    
+  }
+  
+  
+  
+  return(tabla_TX  )
+  
+}
+
+
 
