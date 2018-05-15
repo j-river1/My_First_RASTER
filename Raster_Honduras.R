@@ -9,6 +9,7 @@ library(soiltexture)
 library(scales)
 library(here)
 
+
 #Folders 
 mainDir <- getwd()
 dir.create(file.path(mainDir, "RData"), showWarnings = FALSE)
@@ -72,17 +73,15 @@ ElevationInfo=stack(listFiles[2])
 
 setwd(mainDir)
 
-#***Read coordinatesExtract Weather***
-
 rasterRef=raster("//dapadfs/workspace_cluster_8/AEPS/HONDURAS/ClasificacionesFinales/Raster_mclust_PCA_RedcVariables_Norm_dim11_NClu21.tif")
 levelsWNA=which(!is.na(rasterRef[]))
 coordinatesExtract=xyFromCell(rasterRef,levelsWNA)
 
 #***Read coordinatesExtract Soil***
-crsSystem=ClimeInfo@crs
-soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected", overwrite=TRUE)
+#crsSystem=ClimeInfo@crs
+#soilsInfo_Projected=projectRaster(soilsInfo, crs = crsSystem, filename="soilsInfo_Projected", overwrite=TRUE)
 #save(soilsInfo_Projected,file="./RData/soilsInfo_Projected.RData")
-load(file="./RData/soilsInfo_Projected.RData")
+load(file="./RData/soilsInfo_Projected.RData") 
 
 
 
@@ -97,6 +96,8 @@ info_raster <- function (name_raster, menu)
 {
   
   raster_info  <- raster(paste0(name_raster, ".tif"))
+  #levelsWNA=which(!is.na(raster_info[]))
+  #coordinatesExtract=xyFromCell(raster_info,levelsWNA)
   #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
       
 
@@ -107,20 +108,19 @@ info_raster <- function (name_raster, menu)
     
     namefile <-  "PCA_Kmeans_3Cluster"
     #**Extract the Climate Info
-    #extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    #save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
-    
-    load(file="./RData/extraction_clim_pcaKmeans.RData")
+    extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction,file="./RData/extraction_clim_pcaKmeans.RData")
+    #load(file="./RData/extraction_clim_pcaKmeans.RData")
     
     #**Extract the Soil Info
-    #extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
-    #save(extraction_soil ,file="./RData/extraction_soil.RData")
-    load(file="./RData/extraction_soil.RData")
+    extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
+    save(extraction_soil ,file="./RData/extraction_soil.RData")
+    #load(file="./RData/extraction_soil.RData")
     
     #**Extract Elevation
-    #extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
-    #save(extraction_ele ,file="./RData/extraction_ele_PCAKmeans.RData")
-    load(file="./RData/extraction_ele_PCAKmeans.RData")
+    extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
+    save(extraction_ele ,file="./RData/extraction_ele_PCAKmeans.RData")
+    #load(file="./RData/extraction_ele_PCAKmeans.RData")
   }
   
   if(name_raster == PCA_Mclust)
@@ -130,17 +130,17 @@ info_raster <- function (name_raster, menu)
     #**Extract the Climate Info
     extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     save(extraction,file="./RData/extraction_clim_pca_Mclust.RData")
-    load(file="./RData/extraction_clim_pca_Mclust.RData")
+    #load(file="./RData/extraction_clim_pca_Mclust.RData")
     
     #**Extract the Soil Info
     extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     save(extraction_soil ,file="./RData/extraction_soil_PCAMCLUST.RData")
-    load(file="./RData/extraction_soil_PCAMCLUST.RData")
+    #load(file="./RData/extraction_soil_PCAMCLUST.RData")
     
     #**Extract Elevation
     extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     save(extraction_ele ,file="./RData/extraction_ele_PCAMCLUST.RData")
-    load(file="./RData/extraction_ele_PCAMCLUST.RData")
+    #load(file="./RData/extraction_ele_PCAMCLUST.RData")
     
    }
   
@@ -152,20 +152,20 @@ info_raster <- function (name_raster, menu)
     #**Extract the Climate Info
     extraction <- data.frame(cbind(extract(ClimeInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     save(extraction,file="./RData/extraction_clim_tnse_GNG.RData")
-    load(file="./RData/extraction_clim_tnse_GNG.RData")
+    #load(file="./RData/extraction_clim_tnse_GNG.RData")
     
     
     
     #Extract the Soil Info
     extraction_soil <- data.frame(cbind(extract(soilsInfo_Projected,coordinatesExtract),extract(raster_info,coordinatesExtract))) 
     save(extraction_soil ,file="./RData/extraction_soil_tnse_GNG.RData")
-    load(file="./RData/extraction_soil_tnse_GNG.RData")
+    #load(file="./RData/extraction_soil_tnse_GNG.RData")
     
         
     #**Extract Elevation
     extraction_ele <- data.frame(cbind(extract(ElevationInfo,coordinatesExtract),extract(raster_info,coordinatesExtract)))
     save(extraction_ele ,file="./RData/extraction_ele_tnse_GNG.RData")
-    load(file="./RData/extraction_ele_tnse_GNG.RData")
+    #load(file="./RData/extraction_ele_tnse_GNG.RData")
   }
   
   
@@ -525,7 +525,9 @@ info_raster <- function (name_raster, menu)
   
     
   
-  
+  if (menu == 1)
+  {
+    
   #list   
   final_result <- do.call("cbind", result)
   final_result<- final_result [complete.cases(final_result), ]
@@ -568,7 +570,14 @@ info_raster <- function (name_raster, menu)
               final_result$TMean_Sept, final_result$TMean_Oct, final_result$TMean_Nov, final_result$TMean_Nov )
   
   tableu_format <- data.frame(Mes=Mes, IDCluster=IDCluster, N_Cluster=N_Cluster , P_mean=P_mean, T_max=T_max, T_mean=T_mean, T_min=T_min)
-  write.csv(tableu_format, file = paste0(here(), "/Excel_files/", namefile, "_Tableu", ".csv"), row.names=FALSE )
+  #write.csv(tableu_format, file = paste0(here(), "/Excel_files/", namefile, "_Tableu", ".csv"), row.names=FALSE )
+  
+  }
+  
+  else 
+  {
+    tableu_format <- result 
+  }
   return(tableu_format)
   
   
@@ -933,7 +942,7 @@ soil_texture <- function (method)
   
   wer <- lapply(split_table, getting_texture, method = name_method )
   
-  return(split_table )
+  return(wer  )
   
 }
 
@@ -968,16 +977,36 @@ getting_texture <- function (table, method)
                                              "Arena","Arena_Franca","Franco_Arenoso","Franco", "Franco_Limoso",
                                              "Limo","Franco_Arcilloso" ))
     
+    
+  
+    if(method == "PCA_Mclust")
+    {
+      IDCluster <- 5  
+    }
+    if(method == "PCA_Kmeans")
+    {
+      IDCluster <- 3
+    }
+    if(method == "tnse_GNG")
+    {
+      IDCluster <- 7
+    }
+    
     resultado <- merge(resumen, table_names)
     resultado <- resultado[order(-resultado[,2]),]
-    resultado$Total <- percent(round(resultado$NumeroMuestras/sum(resultado$NumeroMuestras), digits = 2))
-    resultado <- resultado[c("Siglas", "Textura", "NumeroMuestras", "Total")]
+    #resultado$Total <- percent(round(resultado$NumeroMuestras/sum(resultado$NumeroMuestras), digits = 2))
+    resultado$Total <- round(resultado$NumeroMuestras/sum(resultado$NumeroMuestras), digits = 2)
+    resultado$N_cluster <- cluster
+    resultado$IDCluster <- IDCluster
+    resultado <- resultado[c("Siglas", "Textura", "NumeroMuestras", "Total", "N_cluster", "IDCluster")]
+    
+    
       
     write.csv  (resultado, file = paste0("./Textura_Suelos_Excel/", method, "cluster_", cluster, ".csv"), row.names=FALSE)
     
     
-    return(cluster)
-      
+    #return(cluster)
+    return(resultado) 
 }
 
 
@@ -1248,5 +1277,39 @@ plot <- function(method, method_variables)
   
 }
 
+#join files for making one file. 
+
+join_files <- function ()
+{
+  listfiles <- list.files(here::here("Excel_files"), pattern = "Tableu")
+  readfiles <- lapply(listfiles, function (x){
+                                              read_file <- read.csv(paste0(here::here("Excel_Files"), "/", x))
+                                              
+                                             })
+  join <- do.call("rbind", readfiles )
+  
+  write.csv ( join, file = paste0(here::here("Excel_files"), "/", "AllVariables_PCA_Kmeans_Weather.csv"))
+  
+}  
+
+
+join_files_soil_tableu <- function()
+{
+  
+  readfiles  <- lapply( list.files(here::here("Textura_Suelos_Excel")), function (x){ 
+    
+                                                                    read_file <- read.csv(paste0(here::here("Textura_Suelos_Excel"), "/", x))
+                                                                      
+                                                                      })
+  join <- do.call("rbind", readfiles)
+  write.csv ( join, file = paste0(here::here("Excel_files"), "/", "Tabla_Texturas_Excel.csv"))
+          
+          
+  
+}
+
+
+#How to put elevation
+#table(cut(qw$`1`$Elevacion, breaks = seq(from = 0, to = max(qw$`1`$Elevacion), by = 100)))
 
 
