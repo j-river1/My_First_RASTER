@@ -1309,6 +1309,58 @@ join_files_soil_tableu <- function()
 }
 
 
+#Format for elevation file
+
+
+intervals <- function (mode)
+{
+  intervalos  <- graph_all_elevation_complete(mode)
+  
+  
+  if(mode == tnse_GNG)
+  {
+    IDCluster <- 7
+    
+  }
+  
+  if(mode == PCA_Mclust)
+  {
+    intervalos$IDCluster <- 5
+    
+  }
+  
+  if(mode == PCA_Kmeans)
+  {
+    intervalos$IDCluster <- 3
+    
+  }
+  
+  
+  inter <- lapply(intervalos, function (x){ 
+                                            i <- 1
+                                            breaks <- seq(from = 0, to = max(x$Elevacion), by = 100)
+                                            mult_one <- seq(from = 101, to = max(x$Elevacion), by = 100)
+                                            
+                                            breaks_final <- c(breaks, mult_one) 
+                                            final <- table(cut(x$Elevacion, breaks = breaks_final))
+                                            
+                                            final <- as.data.frame(final)
+                                            
+                                            delete <- seq(2, length(final$Var1), by =2)
+                                            final <- final[-delete,]
+                                            
+                                            final$Var1 <- gsub("\\(", "[", final$Var1 )
+                                            
+                                            final$IDCluster <- IDCluster
+                                            final$clus <- i
+                                            
+                                            i<- i + 1 
+
+                                          })
+  return (inter)
+  
+}
+
 #How to put elevation
 #table(cut(qw$`1`$Elevacion, breaks = seq(from = 0, to = max(qw$`1`$Elevacion), by = 100)))
 
